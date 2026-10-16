@@ -1,6 +1,5 @@
 Rails.application.routes.draw do
   resource :session
-  resources :passwords, param: :token
 
   namespace :agent do
     resources :tickets, only: :index
