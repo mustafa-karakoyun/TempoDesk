@@ -1,0 +1,100 @@
+<% content_for :title, "Temsilci Paneli — TempoDesk" %>
+
+<div class="agent-dashboard">
+  <div class="dashboard-header">
+    <div>
+      <h1 class="dashboard-title">Destek Masası — Bilet Sırası</h1>
+      <p class="dashboard-subtitle">
+        Tüm gelen destek talepleri, SLA önceliği ve kalan çözüm süresine göre sıralanmıştır.
+      </p>
+    </div>
+  </div>
+
+  <!-- Metrik Kartları -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-label">Aktif Biletler (Yeni / Açık)</div>
+      <div class="metric-value"><%= @active_count %></div>
+    </div>
+    <div class="metric-card <%= 'metric-card-danger' if @breached_count > 0 %>">
+      <div class="metric-label">SLA İhlali Olan Biletler</div>
+      <div class="metric-value"><%= @breached_count %></div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Çözülen / Kapatılan</div>
+      <div class="metric-value"><%= @solved_count %></div>
+    </div>
+  </div>
+
+  <!-- Filtreleme Sekmeleri -->
+  <div class="filter-tabs">
+    <%= link_to "Aktif Biletler", agent_tickets_path(filter: "active"), class: "filter-tab #{'filter-tab-active' if @filter == 'active'}" %>
+    <%= link_to "Tüm Biletler", agent_tickets_path(filter: "all"), class: "filter-tab #{'filter-tab-active' if @filter == 'all'}" %>
+    <%= link_to "Çözülenler", agent_tickets_path(filter: "solved"), class: "filter-tab #{'filter-tab-active' if @filter == 'solved'}" %>
+    <%= link_to "Kapatılanlar", agent_tickets_path(filter: "closed"), class: "filter-tab #{'filter-tab-active' if @filter == 'closed'}" %>
+  </div>
+
+  <!-- Bilet Tablosu -->
+  <div class="card ticket-table-card">
+    <% if @tickets.any? %>
+      <div class="table-responsive">
+        <table class="data-table" id="agentTicketsTable">
+          <thead>
+            <tr>
+              <th style="width: 70px;">No</th>
+              <th>Bilet / Müşteri</th>
+              <th style="width: 110px;">Durum</th>
+              <th style="width: 100px;">Öncelik</th>
+              <th style="width: 160px;">SLA Durumu</th>
+              <th style="width: 130px;">Hedef Tarih</th>
+              <th style="width: 90px; text-align: right;">İşlem</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @tickets.each do |ticket| %>
+              <tr class="table-row <%= 'row-breached' if ticket.sla_breached? && !ticket.resolved? %>">
+                <td class="cell-id">#<%= ticket.id %></td>
+                <td>
+                  <div class="table-ticket-title">
+                    <%= link_to ticket.title, agent_ticket_path(ticket), class: "ticket-link" %>
+                  </div>
+                  <div class="table-ticket-email"><%= ticket.customer_email %></div>
+                </td>
+                <td>
+                  <span class="badge <%= status_badge_class(ticket.status) %>">
+                    <%= status_label(ticket.status) %>
+                  </span>
+                </td>
+                <td>
+                  <span class="badge <%= priority_badge_class(ticket.priority) %>">
+                    <%= priority_label(ticket.priority) %>
+                  </span>
+                </td>
+                <td>
+                  <span class="badge <%= sla_badge_class(ticket) %>">
+                    <%= sla_label(ticket) %>
+                  </span>
+                </td>
+                <td class="cell-date">
+                  <%= ticket.due_at.strftime("%d.%m %H:%M") %>
+                </td>
+                <td style="text-align: right;">
+                  <%= link_to "İncele", agent_ticket_path(ticket), class: "btn-table-action" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="empty-state">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" class="empty-icon">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <p class="empty-text">Bu filtreye uygun bilet bulunamadı.</p>
+      </div>
+    <% end %>
+  </div>
+</div>

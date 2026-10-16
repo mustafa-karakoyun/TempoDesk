@@ -8,7 +8,12 @@ Rails.application.routes.draw do
   resource :session
 
   namespace :agent do
-    resources :tickets, only: :index
+    resources :tickets, only: [ :index, :show ] do
+      member do
+        patch :transition
+      end
+      resources :comments, only: [ :create ]
+    end
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

@@ -1,0 +1,146 @@
+<% content_for :title, "Bilet ##{@ticket.id}: #{@ticket.title} — TempoDesk" %>
+
+<div class="agent-ticket-view">
+  <div class="view-navigation">
+    <%= link_to "← Bilet Sırasına Dön", agent_tickets_path, class: "back-link" %>
+  </div>
+
+  <!-- Bilet Üst Kartı ve Durum Butonları -->
+  <div class="card ticket-header-card">
+    <div class="ticket-header-top">
+      <div class="ticket-badges">
+        <span class="badge <%= status_badge_class(@ticket.status) %>">
+          <%= status_label(@ticket.status) %>
+        </span>
+        <span class="badge <%= priority_badge_class(@ticket.priority) %>">
+          <%= priority_label(@ticket.priority) %> Öncelik
+        </span>
+        <span class="badge <%= sla_badge_class(@ticket) %>" id="agent-sla-badge">
+          <%= sla_label(@ticket) %>
+        </span>
+      </div>
+
+      <!-- Durum Geçiş Aksiyonları -->
+      <div class="status-action-group">
+        <% if @ticket.status_new? %>
+          <%= button_to "Bileti Aç (Open)", transition_agent_ticket_path(@ticket, status: "open"), method: :patch, class: "btn btn-transition btn-status-open" %>
+        <% elsif @ticket.status_open? %>
+          <%= button_to "Çözüldü İşaretle (Solved)", transition_agent_ticket_path(@ticket, status: "solved"), method: :patch, class: "btn btn-transition btn-status-solved" %>
+        <% elsif @ticket.status_solved? %>
+          <%= button_to "Bileti Kapat (Closed)", transition_agent_ticket_path(@ticket, status: "closed"), method: :patch, class: "btn btn-transition btn-status-closed" %>
+          <%= button_to "Yeniden Aç (Reopen)", transition_agent_ticket_path(@ticket, status: "open"), method: :patch, class: "btn btn-transition btn-outline" %>
+        <% elsif @ticket.status_closed? %>
+          <span class="badge badge-status-closed">Kapatılmış Bilet</span>
+        <% end %>
+      </div>
+    </div>
+
+    <h1 class="ticket-title">#<%= @ticket.id %> — <%= @ticket.title %></h1>
+
+    <div class="ticket-meta-row">
+      <span class="meta-item">
+        <strong>Müşteri:</strong> <%= @ticket.customer_email %>
+      </span>
+      <span class="meta-item">
+        <strong>Açılış:</strong> <%= @ticket.created_at.strftime("%d.%m.%Y %H:%M") %>
+      </span>
+      <span class="meta-item">
+        <strong>SLA Hedefi:</strong> <%= @ticket.due_at.strftime("%d.%m.%Y %H:%M") %>
+      </span>
+      <% if @ticket.status_solved? && @ticket.solved_at.present? %>
+        <span class="meta-item meta-solved">
+          <strong>Çözüldüğü Tarih:</strong> <%= @ticket.solved_at.strftime("%d.%m.%Y %H:%M") %>
+        </span>
+      <% end %>
+      <span class="meta-item">
+        <%= link_to "Müşteri Takip Sayfası ↗", customer_ticket_path(@ticket.access_token), target: "_blank", class: "portal-link" %>
+      </span>
+    </div>
+
+    <div class="ticket-description-box">
+      <h2 class="section-subheading">Talep Açıklaması</h2>
+      <div class="prose-content">
+        <%= simple_format(@ticket.description) %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Yorum Akışı -->
+  <div class="comments-section">
+    <h2 class="comments-heading">
+      <span>Görüşme Geçmişi ve Yanıtlar</span>
+      <span class="comments-count"><%= @comments.count %></span>
+    </h2>
+
+    <% if @comments.any? %>
+      <div class="comments-stream">
+        <% @comments.each do |comment| %>
+          <div class="comment-card <%= comment.author_role_agent? ? 'comment-agent' : 'comment-customer' %>">
+            <div class="comment-header">
+              <div class="comment-author">
+                <span class="author-name"><%= comment.author_name %></span>
+                <% if comment.author_role_agent? %>
+                  <span class="badge badge-agent-role">Destek Temsilcisi (Siz)</span>
+                <% else %>
+                  <span class="badge badge-customer-role">Müşteri</span>
+                <% end %>
+              </div>
+              <time class="comment-time"><%= comment.created_at.strftime("%d.%m.%Y %H:%M") %></time>
+            </div>
+            <div class="comment-body">
+              <%= simple_format(comment.body) %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="empty-stream-card">
+        <p>Bu bilete henüz herhangi bir yanıt eklenmemiştir.</p>
+      </div>
+    <% end %>
+
+    <!-- Temsilci Yanıt Formu -->
+    <div class="reply-form-wrapper">
+      <% if @ticket.status_closed? %>
+        <div class="ticket-closed-banner">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span>Bu destek bileti kapatılmıştır. Kapatılmış biletlere yeni yanıt gönderilemez.</span>
+        </div>
+      <% else %>
+        <div class="card reply-card">
+          <h3 class="reply-card-title">Müşteriye Yanıt Gönder</h3>
+
+          <% if @ticket.status_new? %>
+            <div class="hint-banner-blue">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <span>İlk yanıtınızı gönderdiğinizde, bilet durumu otomatik olarak <strong>Yeni → Açık</strong> olarak güncellenecektir.</span>
+            </div>
+          <% end %>
+
+          <%= form_with model: @new_comment, url: agent_ticket_comments_path(@ticket), class: "form-stack" do |f| %>
+            <div class="form-group">
+              <%= f.label :author_name, "Temsilci İsmi / İmzası", class: "form-label" %>
+              <%= f.text_field :author_name, required: true, class: "form-input" %>
+            </div>
+
+            <div class="form-group">
+              <%= f.label :body, "Yanıtınız", class: "form-label" %>
+              <%= f.text_area :body, rows: 4, required: true, placeholder: "Müşteriye iletilecek profesyonel çözümü veya soruyu yazınız...", class: "form-textarea" %>
+            </div>
+
+            <div class="form-actions">
+              <%= f.submit "Müşteriye Yanıtı İlet", class: "btn btn-primary" %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

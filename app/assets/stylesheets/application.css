@@ -631,3 +631,305 @@ body {
   color: var(--slate-900);
   margin-bottom: 1rem;
 }
+
+/* ==========================================================================
+   Agent Dashboard & Operations
+   ========================================================================== */
+
+.agent-dashboard, .agent-ticket-view {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--slate-900);
+  letter-spacing: -0.02em;
+}
+
+.dashboard-subtitle {
+  color: var(--slate-500);
+  font-size: 0.95rem;
+  margin-top: 0.25rem;
+}
+
+/* Metrics Grid */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+@media (max-width: 640px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.metric-card {
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: 10px;
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.metric-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: var(--slate-500);
+}
+
+.metric-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--slate-900);
+  margin-top: 0.35rem;
+  line-height: 1;
+}
+
+.metric-card-danger {
+  border-color: var(--rose-200);
+  background: #fff8f8;
+}
+
+.metric-card-danger .metric-value {
+  color: var(--rose-600);
+}
+
+/* Filter Tabs */
+.filter-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--slate-200);
+  padding-bottom: 0.5rem;
+  overflow-x: auto;
+}
+
+.filter-tab {
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--slate-600);
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.filter-tab:hover {
+  background: var(--slate-100);
+  color: var(--slate-900);
+}
+
+.filter-tab-active {
+  background: var(--primary-600);
+  color: #ffffff !important;
+}
+
+/* Data Table */
+.ticket-table-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.data-table th {
+  background: var(--slate-50);
+  padding: 0.85rem 1rem;
+  font-size: 0.775rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--slate-500);
+  border-bottom: 1px solid var(--slate-200);
+}
+
+.data-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--slate-100);
+  vertical-align: middle;
+}
+
+.table-row:hover {
+  background: var(--slate-50);
+}
+
+.row-breached {
+  background: #fff5f5;
+}
+
+.row-breached:hover {
+  background: #ffebeb;
+}
+
+.cell-id {
+  font-weight: 700;
+  color: var(--slate-400);
+  font-family: monospace;
+}
+
+.table-ticket-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.ticket-link {
+  color: var(--slate-900);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.ticket-link:hover {
+  color: var(--primary-600);
+}
+
+.table-ticket-email {
+  font-size: 0.8rem;
+  color: var(--slate-500);
+  margin-top: 0.15rem;
+}
+
+.cell-date {
+  font-size: 0.85rem;
+  color: var(--slate-600);
+  font-family: monospace;
+}
+
+.btn-table-action {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--primary-700);
+  background: var(--primary-50);
+  border: 1px solid var(--primary-100);
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.btn-table-action:hover {
+  background: var(--primary-600);
+  color: #ffffff;
+}
+
+/* Agent Ticket Show Styles */
+.view-navigation {
+  margin-bottom: 1rem;
+}
+
+.back-link {
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--slate-600);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.back-link:hover {
+  color: var(--primary-600);
+}
+
+.ticket-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
+}
+
+.status-action-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-transition {
+  font-size: 0.85rem;
+  padding: 0.45rem 0.9rem;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+.btn-status-open {
+  background: var(--amber-600);
+  color: #ffffff;
+}
+
+.btn-status-open:hover {
+  background: var(--amber-700);
+}
+
+.btn-status-solved {
+  background: var(--emerald-600);
+  color: #ffffff;
+}
+
+.btn-status-solved:hover {
+  background: var(--emerald-700);
+}
+
+.btn-status-closed {
+  background: var(--slate-800);
+  color: #ffffff;
+}
+
+.btn-status-closed:hover {
+  background: var(--slate-900);
+}
+
+.btn-outline {
+  background: #ffffff;
+  border: 1px solid var(--slate-300);
+  color: var(--slate-700);
+}
+
+.btn-outline:hover {
+  background: var(--slate-100);
+}
+
+.portal-link {
+  color: var(--primary-600);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.portal-link:hover {
+  text-decoration: underline;
+}
+
+.hint-banner-blue {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: var(--primary-50);
+  border: 1px solid var(--primary-100);
+  color: var(--primary-900);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  margin-bottom: 1.25rem;
+}
