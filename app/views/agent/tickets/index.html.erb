@@ -10,30 +10,6 @@
     </div>
   </div>
 
-  <!-- Metrik Kartları -->
-  <div class="metrics-grid">
-    <div class="metric-card">
-      <div class="metric-label">Aktif Biletler (Yeni / Açık)</div>
-      <div class="metric-value"><%= @active_count %></div>
-    </div>
-    <div class="metric-card <%= 'metric-card-danger' if @breached_count > 0 %>">
-      <div class="metric-label">SLA İhlali Olan Biletler</div>
-      <div class="metric-value"><%= @breached_count %></div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-label">Çözülen / Kapatılan</div>
-      <div class="metric-value"><%= @solved_count %></div>
-    </div>
-  </div>
-
-  <!-- Filtreleme Sekmeleri -->
-  <div class="filter-tabs">
-    <%= link_to "Aktif Biletler", agent_tickets_path(filter: "active"), class: "filter-tab #{'filter-tab-active' if @filter == 'active'}" %>
-    <%= link_to "Tüm Biletler", agent_tickets_path(filter: "all"), class: "filter-tab #{'filter-tab-active' if @filter == 'all'}" %>
-    <%= link_to "Çözülenler", agent_tickets_path(filter: "solved"), class: "filter-tab #{'filter-tab-active' if @filter == 'solved'}" %>
-    <%= link_to "Kapatılanlar", agent_tickets_path(filter: "closed"), class: "filter-tab #{'filter-tab-active' if @filter == 'closed'}" %>
-  </div>
-
   <!-- Bilet Tablosu -->
   <div class="card ticket-table-card">
     <% if @tickets.any? %>

@@ -3,31 +3,11 @@ module Agent
     before_action :set_ticket, only: [ :show, :transition ]
 
     def index
-      # İhlalliler ve süresi yaklaşanlar önce gelecek şekilde sıralama:
-      # Aktif biletler (new=0, open=1) önce listelenir, aralarında en erken due_at (yani süresi geçmiş veya yaklaşanlar) en üstte çıkar.
-      base_scope = Ticket.all
-
-      @filter = params[:filter].presence || "active"
-      @tickets = case @filter
-                 when "all"
-                   base_scope
-                 when "solved"
-                   base_scope.where(status: :solved)
-                 when "closed"
-                   base_scope.where(status: :closed)
-                 else # "active" default
-                   base_scope.where(status: [ :new, :open ])
-      end
-
-      # İhlalliler (due_at geçmiş olanlar) ve süresi yaklaşanlar önce
-      @tickets = @tickets.order(
+      # İhlalliler ve süresi yaklaşanlar önce gelecek şekilde sıralanmış bilet listesi:
+      # Aktif biletler (new=0, open=1) önce listelenir, aralarında en erken due_at en üstte çıkar.
+      @tickets = Ticket.order(
         Arel.sql("CASE WHEN status IN (0, 1) THEN 0 ELSE 1 END, due_at ASC")
       )
-
-      # İstatistik sayaçları
-      @active_count = Ticket.where(status: [ :new, :open ]).count
-      @breached_count = Ticket.where(status: [ :new, :open ]).where("due_at < ?", Time.current).count
-      @solved_count = Ticket.where(status: [ :solved, :closed ]).count
     end
 
     def show

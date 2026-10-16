@@ -25,13 +25,26 @@ class Agent::TicketsControllerTest < ActionDispatch::IntegrationTest
     assert_select "#agentTicketsTable"
   end
 
-  test "filtreleme parametreleri calisir" do
-    sign_in_as @user
-    get agent_tickets_path(filter: "all")
-    assert_response :success
+  test "bilet listesi SLA onceligine gore siralanir" do
+    urgent_ticket = Ticket.create!(
+      title: "Acil Sistem Kesintisi",
+      description: "Detaylar",
+      customer_email: "acil@example.com",
+      priority: :urgent
+    )
+    low_ticket = Ticket.create!(
+      title: "Dusuk Oncelikli Soru",
+      description: "Detaylar",
+      customer_email: "dusuk@example.com",
+      priority: :low
+    )
 
-    get agent_tickets_path(filter: "solved")
+    sign_in_as @user
+    get agent_tickets_path
     assert_response :success
+    assert_select "#agentTicketsTable"
+    # Acil olan daha kisa sureli (due_at daha erken) oldugu icin once listelenir
+    assert response.body.index("Acil Sistem Kesintisi") < response.body.index("Dusuk Oncelikli Soru")
   end
 
   test "girissiz kullanici bilet detayini acamaz" do
