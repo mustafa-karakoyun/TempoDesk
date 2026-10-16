@@ -1,29 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
   <head>
-    <title><%= content_for(:title) || "Tempodesk" %></title>
+    <title><%= content_for(:title) || "TempoDesk" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Tempodesk">
+    <meta name="application-name" content="TempoDesk">
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%= yield :head %>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
-    <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
   <body>
-    <%= yield %>
+    <header class="app-header">
+      <div class="header-container">
+        <a href="<%= root_path %>" class="brand-logo">
+          <!-- TempoDesk Nabız / Pulse İkonu -->
+          <svg class="pulse-icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+          <span class="brand-name">Tempo<span class="brand-highlight">Desk</span></span>
+        </a>
+
+        <nav class="nav-links">
+          <a href="<%= root_path %>" class="nav-link">Yeni Bilet</a>
+          <% if authenticated? %>
+            <a href="<%= agent_tickets_path %>" class="nav-link nav-link-agent">Temsilci Paneli</a>
+            <%= button_to "Çıkış Yap", session_path, method: :delete, class: "nav-btn-logout" %>
+          <% else %>
+            <a href="<%= new_session_path %>" class="nav-link nav-link-agent">Temsilci Girişi</a>
+          <% end %>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="content-container">
+        <% if flash[:notice].present? %>
+          <div class="flash-message flash-notice">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <span><%= flash[:notice] %></span>
+          </div>
+        <% end %>
+
+        <% if flash[:alert].present? %>
+          <div class="flash-message flash-alert">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <span><%= flash[:alert] %></span>
+          </div>
+        <% end %>
+
+        <%= yield %>
+      </div>
+    </main>
+
+    <footer class="app-footer">
+      <div class="footer-container">
+        <span>TempoDesk — Kurumsal Destek &amp; SLA Yönetimi</span>
+      </div>
+    </footer>
   </body>
 </html>

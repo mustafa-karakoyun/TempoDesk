@@ -1,0 +1,129 @@
+<% content_for :title, "#{@ticket.title} — TempoDesk" %>
+
+<div class="ticket-detail-view">
+  <!-- Gizli Takip Linki Bilgilendirmesi -->
+  <div class="secret-link-card">
+    <div class="secret-link-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+      </svg>
+    </div>
+    <div class="secret-link-content">
+      <div class="secret-link-title">Özel Takip Bağlantınız</div>
+      <p class="secret-link-desc">
+        Bu sayfayı tarayıcınızda yer imlerine ekleyebilir veya bağlantıyı kaydederek dilediğiniz zaman bilet durumunu takip edebilirsiniz.
+      </p>
+      <div class="secret-link-input-group">
+        <input type="text" readonly value="<%= customer_ticket_url(@ticket.access_token) %>" class="form-input secret-input" id="secretLinkInput" onclick="this.select()">
+      </div>
+    </div>
+  </div>
+
+  <!-- Bilet Başlık ve Durum Kartı -->
+  <div class="card ticket-header-card">
+    <div class="ticket-header-main">
+      <div class="ticket-badges">
+        <span class="badge <%= status_badge_class(@ticket.status) %>">
+          <%= status_label(@ticket.status) %>
+        </span>
+        <span class="badge <%= priority_badge_class(@ticket.priority) %>">
+          <%= priority_label(@ticket.priority) %> Öncelik
+        </span>
+        <span class="badge <%= sla_badge_class(@ticket) %>" id="ticket-sla-badge">
+          <%= sla_label(@ticket) %>
+        </span>
+      </div>
+
+      <h1 class="ticket-title"><%= @ticket.title %></h1>
+
+      <div class="ticket-meta-row">
+        <span class="meta-item">
+          <strong>Açılış:</strong> <%= @ticket.created_at.strftime("%d.%m.%Y %H:%M") %>
+        </span>
+        <span class="meta-item">
+          <strong>İlgili:</strong> <%= @ticket.customer_email %>
+        </span>
+        <% if @ticket.status_solved? && @ticket.solved_at.present? %>
+          <span class="meta-item meta-solved">
+            <strong>Çözüm:</strong> <%= @ticket.solved_at.strftime("%d.%m.%Y %H:%M") %>
+          </span>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="ticket-description-box">
+      <h2 class="section-subheading">Açıklama</h2>
+      <div class="prose-content">
+        <%= simple_format(@ticket.description) %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Yorum / Yanıt Akışı -->
+  <div class="comments-section">
+    <h2 class="comments-heading">
+      <span>Yanıtlar ve Güncellemeler</span>
+      <span class="comments-count"><%= @comments.count %></span>
+    </h2>
+
+    <% if @comments.any? %>
+      <div class="comments-stream">
+        <% @comments.each do |comment| %>
+          <div class="comment-card <%= comment.author_role_agent? ? 'comment-agent' : 'comment-customer' %>">
+            <div class="comment-header">
+              <div class="comment-author">
+                <span class="author-name"><%= comment.author_name %></span>
+                <% if comment.author_role_agent? %>
+                  <span class="badge badge-agent-role">Destek Temsilcisi</span>
+                <% else %>
+                  <span class="badge badge-customer-role">Müşteri</span>
+                <% end %>
+              </div>
+              <time class="comment-time"><%= comment.created_at.strftime("%d.%m.%Y %H:%M") %></time>
+            </div>
+            <div class="comment-body">
+              <%= simple_format(comment.body) %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="empty-stream-card">
+        <p>Henüz bir yanıt eklenmedi. Destek temsilcimiz biletinizi incelediğinde buradan bilgilendirileceksiniz.</p>
+      </div>
+    <% end %>
+
+    <!-- Müşteri Yanıt Formu -->
+    <div class="reply-form-wrapper">
+      <% if @ticket.status_closed? %>
+        <div class="ticket-closed-banner">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span>Bu destek bileti kapatılmıştır. Kapatılmış biletlere yeni yanıt eklenemez.</span>
+        </div>
+      <% else %>
+        <div class="card reply-card">
+          <h3 class="reply-card-title">Yeni Yanıt Ekle</h3>
+          <%= form_with model: @new_comment, url: customer_ticket_comments_path(@ticket.access_token), class: "form-stack" do |f| %>
+            <div class="form-group">
+              <%= f.label :author_name, "Adınız Soyadınız", class: "form-label" %>
+              <%= f.text_field :author_name, required: true, class: "form-input", placeholder: "Adınızı giriniz" %>
+            </div>
+
+            <div class="form-group">
+              <%= f.label :body, "Mesajınız", class: "form-label" %>
+              <%= f.text_area :body, rows: 4, required: true, placeholder: "Sorunuzu, ek bilgileri veya güncellemenizi buraya yazın...", class: "form-textarea" %>
+            </div>
+
+            <div class="form-actions">
+              <%= f.submit "Yanıtı Gönder", class: "btn btn-primary" %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
