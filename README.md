@@ -81,16 +81,16 @@ Aort dilimi (bilet aç → temsilci yanıtla → çöz, çözüm süresi SLA'ya 
 - Ödeme / kart akışı
 
 ### b. Henüz yapılmayanlar (şu anki durum)
-Aşama 0'dan Aşama 5'e kadar olan tüm çekirdek işlevler tamamlandı:
+Aşama 0'dan Aşama 6'ya kadar olan tüm çekirdek işlevler tamamlandı:
 - Temsilci kimlik doğrulama akışı
 - `Ticket` ve `Comment` veri modelleri, SLA zaman kuralları (`SlaPolicy`), durum akışı (`transition_to!`)
 - Herkese açık müşteri bilet oluşturma formu (`/`), gizli takip bağlantısı (`/t/:access_token`), müşteri yanıt formu
-- Temsilci bilet listesi (`/agent/tickets`), SLA öncelik sıralaması, filtreleme sekmeleri, bilet detayı (`/agent/tickets/:id`), durum değiştirme aksiyonları ve ilk yanıtta otomatik açılma (`new → open`)
+- Temsilci bilet listesi (`/agent/tickets`), SLA öncelik sıralaması, bilet detayı (`/agent/tickets/:id`), durum değiştirme aksiyonları ve ilk yanıtta otomatik açılma (`new → open`)
+- 6 adet gerçekçi örnek demo bilet verisi (idempotent seed: süresi dolmuş acil ihlalli bilet, zamanında çözülmüş, yeni, geç çözülmüş ihlalli, düşük öncelikli ve kapatılmış biletler)
+- TempoDesk nabız SVG logosu, favicon (`public/icon.svg`) ve sayfa başlıkları (`<title>`)
 - 50 adet otomatik test (model, SLA `travel_to`, müşteri entegrasyonu, temsilci entegrasyonu) yeşil ve doğrulanmış durumdadır.
 
 Aşağıdakiler **henüz yapılmamıştır**:
-- Demo bilet verisi (seed dosyasında yalnızca demo temsilci hesabı var; SLA ihlalli ve çözülmüş örnek biletler Aşama 6'da eklenecektir)
-- Logo, favicon ve navbar marka detayları özelleştirmesi (Aşama 6)
 - GitHub Actions'ta çalışan CI ve README'deki CI rozeti (Aşama 7)
 - Canlı uygulama (Render). **Canlı URL şu an yoktur.** (Aşama 7)
 - Kullanıcı yorumlarından seçilen acıyı çözen fark özelliği (Aşama 8)

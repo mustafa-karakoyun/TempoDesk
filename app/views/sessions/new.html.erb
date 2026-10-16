@@ -1,8 +1,33 @@
-<%= tag.div(flash[:alert], style: "color:red") if flash[:alert] %>
-<%= tag.div(flash[:notice], style: "color:green") if flash[:notice] %>
+<% content_for :title, "Temsilci Girişi — TempoDesk" %>
 
-<%= form_with url: session_path do |form| %>
-  <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Enter your email address", value: params[:email_address] %><br>
-  <%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: "Enter your password", maxlength: 72 %><br>
-  <%= form.submit "Sign in" %>
-<% end %>
+<div class="form-page-container">
+  <div class="card form-card">
+    <div class="form-header">
+      <div class="header-icon-badge">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+          <polyline points="10 17 15 12 10 7"></polyline>
+          <line x1="15" y1="12" x2="3" y2="12"></line>
+        </svg>
+      </div>
+      <h1 class="form-title">Temsilci Girişi</h1>
+      <p class="form-subtitle">TempoDesk destek masası ve bilet yönetimine erişmek için giriş yapınız.</p>
+    </div>
+
+    <%= form_with url: session_path, class: "form-stack" do |form| %>
+      <div class="form-group">
+        <%= form.label :email_address, "E-Posta Adresi", class: "form-label" %>
+        <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "agent@tempodesk.example", value: params[:email_address], class: "form-input" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :password, "Şifre", class: "form-label" %>
+        <%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: "••••••••", maxlength: 72, class: "form-input" %>
+      </div>
+
+      <div class="form-actions">
+        <%= form.submit "Giriş Yap", class: "btn btn-primary btn-block" %>
+      </div>
+    <% end %>
+  </div>
+</div>
