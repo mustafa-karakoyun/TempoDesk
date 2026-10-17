@@ -4,6 +4,7 @@
 
 > Kurumsal Destek Masası (Helpdesk) & SLA Yönetimi Aort Dilimi  
 > **Teknoloji:** Ruby on Rails 8, PostgreSQL, Minitest, Sade ERB + Vanilla CSS  
+> **Canlı Uygulama (Render):** [https://tempodesk.onrender.com/](https://tempodesk.onrender.com/)  
 > **GitHub Deposu:** [https://github.com/mustafa-karakoyun/TempoDesk](https://github.com/mustafa-karakoyun/TempoDesk)
 
 ---
@@ -59,13 +60,22 @@ Aşağıdaki tablo, Fortune 500 şirketlerinin genel büyüklük ölçeğini ve 
 
 ---
 
-## 4. Kurulum ve Yerel Çalıştırma
+## 4. Kurulum ve Çalıştırma
 
-### Gereksinimler
+### Canlı Ortam (Render)
+- **Canlı Uygulama & Müşteri Formu:** [https://tempodesk.onrender.com/](https://tempodesk.onrender.com/)
+- **Temsilci Girişi:** [https://tempodesk.onrender.com/session/new](https://tempodesk.onrender.com/session/new)  
+  - *E-posta:* `agent@tempodesk.example`  
+  - *Parola:* `tempodesk-local-dev` (veya canlıda tanımlanan `AGENT_PASSWORD`)
+- **Temsilci Bilet Sırası:** [https://tempodesk.onrender.com/agent/tickets](https://tempodesk.onrender.com/agent/tickets)
+- **Sağlık Kontrolü:** [https://tempodesk.onrender.com/up](https://tempodesk.onrender.com/up) (HTTP 200 OK)
+
+### Yerel Ortam Kurulumu
+#### Gereksinimler
 - Ruby 3.4+ / Ruby 4
 - PostgreSQL (yerel servis çalışır durumda olmalı)
 
-### Adımlar (Windows PowerShell)
+#### Adımlar (Windows PowerShell)
 ```powershell
 # Bağımlılıkları yükleyin
 bundle install
@@ -74,14 +84,14 @@ bundle install
 $env:PGPASSWORD = "postgres_sifreniz"
 ruby bin/rails db:create db:migrate db:seed
 
-# Test paketini çalıştırın (50 test, 210 assertion)
+# Test paketini çalıştırın (53 test, 228 assertion)
 ruby bin/rails test
 
 # Sunucuyu başlatın
 ruby bin/rails server
 ```
 
-### Ekranlar ve Erişim
+#### Yerel Ekranlar ve Erişim
 - **Müşteri Bilet Formu:** `http://localhost:3000/`
 - **Temsilci Girişi:** `http://localhost:3000/session/new`  
   - *E-posta:* `agent@tempodesk.example`  
@@ -124,11 +134,12 @@ Aort dilimi (*Müşteri bilet açar → Temsilci yanıtlar → Çözülür, çö
 - **Otomatik Testler:** Model, SLA zaman kuralları (`travel_to`), müşteri ve temsilci akışları ile çözüm özeti testlerini kapsayan 53 testin tamamı (%100) yeşildir.
 - **GitHub Actions CI (Aşama 7):** `.github/workflows/ci.yml` iş akışı GitHub Actions üzerinde başarıyla çalışmakta ve tüm kontroller (`scan_ruby`, `lint`, `test`, `scan_js`, `system-test`) **%100 yeşil (passing)** olarak doğrulanmaktadır.
 - **Kullanıcı Acısı Çözüm Özelliği (Aşama 8):** G2/Capterra Zendesk incelemelerinde en çok yakınılan "Çözümün nasıl sağlandığı karmaşık mesaj geçmişinde kayboluyor" acısını çözen **Kalıcı Çözüm Özeti (Resolution Summary)** özelliği eklendi. Temsilci bileti çözerken çözüm özeti girebilir; bilet çözüldüğünde bu özet hem müşterinin takip sayfasında hem de temsilci panelinde en üstte belirgin yeşil bilgi kartı olarak sunulur.
+- **Canlı Deploy (Render):** Docker konteyneri ve PostgreSQL veritabanı ile Render üzerinde canlıya alındı: [https://tempodesk.onrender.com/](https://tempodesk.onrender.com/). `bin/docker-entrypoint` aracılığıyla otomatik `db:prepare` ve `db:seed` icra edilmiş; `/up` sağlık kontrolü (200 OK), müşteri bilet akışı ve temsilci paneli canlı ortamda doğrulanmıştır.
 
-### c. Henüz yapılmayanlar (Yalnızca Render Canlı Deploy)
-- **Canlı Deploy (Render):** Canlı URL henüz yoktur. Render PostgreSQL ve Docker konfigürasyonu insan tarafından panelden yapılacaktır.
+### c. Henüz yapılmayanlar
+Aort dilimi kapsamında planlanan tüm çekirdek işlevler, otomatik testler, CI/CD iş akışı ve Render canlı deploy başarıyla tamamlanmıştır. Yapılmayanlar yalnızca yukarıdaki *"Bilerek kapsam dışı bıraktıklarım"* listesindedir.
 
 ### d. Doğrulanmayanlar ve bilinen konular
-- Render'da `AGENT_PASSWORD`, `DATABASE_URL` ve `RAILS_MASTER_KEY` ayarları, Render'ın ücretsiz planındaki kısıtlar ve `Dockerfile`'ın Render'da çalışıp çalışmadığı henüz canlıda test edilmedi.
-- Ruby 4.0.7 ile Rails'in ürettiği `bin/kamal` çalışmıyor (`fiddle` bağımlılığı). Deploy Render'da Docker ile yapılacağı için Kamal kullanılmayacaktır.
-- Geliştirme ortamı Windows'tur, deploy ortamı Linux konteynerdir. Satır sonlarının LF olduğu `.gitattributes` ile güvenceye alınmıştır.
+- **Render Ücretsiz Plan Soğuk Başlangıç (Cold Start):** Render ücretsiz katmanında uygulama 15 dakika trafik almadığında uyku moduna geçer (spin-down). İlk ziyarette uyanması 30–50 saniye sürebilir; bu durum altyapı sağlayıcısının ücretsiz plan kısıtıdır.
+- **Kamal & Ruby 4.0.7:** Ruby 4.0.7 ile Rails'in ürettiği `bin/kamal` çalışmamaktadır (`fiddle` gem uyumsuzluğu). Deploy doğrudan Docker ve Render altyapısı ile yapıldığı için Kamal kullanılmamıştır.
+- **Geliştirme / Deploy Ortamı:** Geliştirme ortamı Windows, deploy ortamı Linux konteynerdir. Satır sonlarının LF olduğu `.gitattributes` ile güvenceye alınmıştır.
