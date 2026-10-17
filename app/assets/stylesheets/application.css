@@ -1224,3 +1224,103 @@ body {
     display: none;
   }
 }
+
+/* ==========================================================================
+   Resolution Summary Box (Aşama 8)
+   ========================================================================== */
+
+.resolution-summary-box {
+  margin-top: var(--space-5);
+  background: var(--emerald-50);
+  border: 1px solid var(--emerald-100);
+  border-left: 4px solid var(--emerald-600);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+}
+
+.resolution-summary-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.resolution-icon {
+  color: var(--emerald-600);
+  flex: none;
+}
+
+.resolution-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--emerald-700);
+  letter-spacing: 0.01em;
+}
+
+.resolution-summary-text {
+  font-size: 0.925rem;
+  color: var(--slate-800);
+  line-height: 1.6;
+}
+
+.resolution-summary-text p + p {
+  margin-top: var(--space-2);
+}
+
+.resolve-details {
+  position: relative;
+  display: inline-block;
+}
+
+.resolve-details summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.resolve-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.resolve-form-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + var(--space-2));
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-4);
+  width: 320px;
+  z-index: 40;
+}
+
+.resolution-textarea {
+  min-height: 4rem;
+  font-size: 0.875rem;
+}
+
+.form-label-sm {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--slate-700);
+  margin-bottom: var(--space-1);
+}
+
+.form-actions-inline {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-3);
+}
+
+.btn-sm {
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 480px) {
+  .resolve-form-dropdown {
+    position: static;
+    width: 100%;
+    margin-top: var(--space-2);
+  }
+}

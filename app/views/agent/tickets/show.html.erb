@@ -25,7 +25,19 @@
         <% if @ticket.status_new? %>
           <%= button_to "Bileti Aç (Open)", transition_agent_ticket_path(@ticket, status: "open"), method: :patch, class: "btn btn-transition btn-status-open" %>
         <% elsif @ticket.status_open? %>
-          <%= button_to "Çözüldü İşaretle (Solved)", transition_agent_ticket_path(@ticket, status: "solved"), method: :patch, class: "btn btn-transition btn-status-solved" %>
+          <details class="resolve-details">
+            <summary class="btn btn-transition btn-status-solved">Çözüldü İşaretle (Solved) ▾</summary>
+            <%= form_with url: transition_agent_ticket_path(@ticket), method: :patch, class: "resolve-form-dropdown" do |f| %>
+              <%= f.hidden_field :status, value: "solved" %>
+              <div class="form-group">
+                <%= f.label :resolution_summary, "Çözüm Özeti (Müşteri & ekiple paylaşılır):", class: "form-label form-label-sm" %>
+                <%= f.text_area :resolution_summary, rows: 3, placeholder: "Sorunun nasıl çözüldüğünü özetleyin...", class: "form-textarea resolution-textarea" %>
+              </div>
+              <div class="form-actions-inline">
+                <%= f.submit "Çözümü Onayla ve Kaydet", class: "btn btn-transition btn-status-solved btn-sm" %>
+              </div>
+            <% end %>
+          </details>
         <% elsif @ticket.status_solved? %>
           <%= button_to "Bileti Kapat (Closed)", transition_agent_ticket_path(@ticket, status: "closed"), method: :patch, class: "btn btn-transition btn-status-closed" %>
           <%= button_to "Yeniden Aç (Reopen)", transition_agent_ticket_path(@ticket, status: "open"), method: :patch, class: "btn btn-transition btn-outline" %>
@@ -56,6 +68,21 @@
         <%= link_to "Müşteri Takip Sayfası ↗", customer_ticket_path(@ticket.access_token), target: "_blank", class: "portal-link" %>
       </span>
     </div>
+
+    <% if @ticket.resolved? && @ticket.resolution_summary.present? %>
+      <div class="resolution-summary-box">
+        <div class="resolution-summary-header">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="resolution-icon" aria-hidden="true">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          <span class="resolution-title">Kayıtlı Çözüm Özeti</span>
+        </div>
+        <div class="resolution-summary-text">
+          <%= simple_format(@ticket.resolution_summary) %>
+        </div>
+      </div>
+    <% end %>
 
     <div class="ticket-description-box">
       <h2 class="section-subheading">Talep Açıklaması</h2>

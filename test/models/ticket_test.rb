@@ -157,4 +157,12 @@ class TicketTest < ActiveSupport::TestCase
   test "ihlal veritabaninda saklanmaz" do
     assert_not_includes Ticket.column_names, "sla_breached"
   end
+
+  test "solved gecisi opsiyonel resolution_summary kaydeder" do
+    ticket = move_to(build_ticket, "open")
+    assert_nil ticket.resolution_summary
+
+    ticket.transition_to!("solved", resolution_summary: "Kök neden: DNS kaydı düzeltildi.")
+    assert_equal "Kök neden: DNS kaydı düzeltildi.", ticket.reload.resolution_summary
+  end
 end

@@ -153,4 +153,22 @@ class CustomerTicketsTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_select ".flash-alert", text: /Kapatılmış bir bilete yeni yanıt eklenemez/
   end
+
+  test "cozulmus ve cozum ozeti olan bilette musteri cozum ozeti kutusunu gorur" do
+    ticket = Ticket.create!(
+      title: "Alan Adı Yönlendirme",
+      description: "DNS ayarları çalışmıyor.",
+      customer_email: "ahmet@example.com",
+      priority: :normal
+    )
+    ticket.transition_to!("open")
+    ozet_metni = "CNAME kaydı doğru sunucu IP'sine yönlendirildi ve TTL süresi güncellendi."
+    ticket.transition_to!("solved", resolution_summary: ozet_metni)
+
+    get customer_ticket_path(ticket.access_token)
+    assert_response :success
+    assert_select ".resolution-summary-box"
+    assert_select ".resolution-title", "Çözüm Özeti"
+    assert_select ".resolution-summary-text", text: /#{ozet_metni}/
+  end
 end

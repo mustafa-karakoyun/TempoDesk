@@ -104,4 +104,20 @@ class Agent::TicketsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".flash-alert", text: /Geçersiz durum geçişi/
     assert @ticket.reload.status_new?
   end
+
+  test "temsilci cozum ozeti girerek bileti solved yapabilir ve detayda ozeti gorur" do
+    sign_in_as @user
+    @ticket.transition_to!("open")
+
+    ozet = "Veritabanı bağlantı havuzu artırıldı ve servis yeniden başlatıldı."
+    patch transition_agent_ticket_path(@ticket), params: { status: "solved", resolution_summary: ozet }
+
+    assert_redirected_to agent_ticket_path(@ticket)
+    assert @ticket.reload.status_solved?
+    assert_equal ozet, @ticket.resolution_summary
+
+    follow_redirect!
+    assert_select ".resolution-summary-box", text: /Kayıtlı Çözüm Özeti/
+    assert_select ".resolution-summary-text", text: /#{ozet}/
+  end
 end

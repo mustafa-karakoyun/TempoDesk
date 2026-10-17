@@ -64,7 +64,9 @@ t2 = Ticket.find_or_create_by!(title: "Kullanıcı Yetkilendirme ve Rol Hatası"
   t.created_at = 1.day.ago
   t.due_at = SlaPolicy.due_at(priority: :high, from: 1.day.ago)
   t.solved_at = 1.day.ago + 3.hours
+  t.resolution_summary = "Rol matrisi tablosunda eksik olan 'departman_yoneticisi' yetki grubu Active Directory eşlemesiyle senkronize edildi. Etkilenen 5 kullanıcının oturumları yenilendi ve erişim sağlandı."
 end
+t2.update_column(:resolution_summary, "Rol matrisi tablosunda eksik olan 'departman_yoneticisi' yetki grubu Active Directory eşlemesiyle senkronize edildi. Etkilenen 5 kullanıcının oturumları yenilendi ve erişim sağlandı.") if t2.resolution_summary.blank?
 
 t2.comments.find_or_create_by!(
   author_role: :customer,
@@ -111,7 +113,9 @@ t4 = Ticket.find_or_create_by!(title: "Veritabanı Replikasyon Gecikmesi") do |t
   t.created_at = 3.days.ago
   t.due_at = SlaPolicy.due_at(priority: :urgent, from: 3.days.ago)
   t.solved_at = 3.days.ago + 10.hours
+  t.resolution_summary = "İkincil düğümdeki disk I/O darboğazı WAL prosesini kilitliyordu. max_wal_size ve checkpoint aralığı optimize edildi, replikasyon gecikmesi sıfırlandı."
 end
+t4.update_column(:resolution_summary, "İkincil düğümdeki disk I/O darboğazı WAL prosesini kilitliyordu. max_wal_size ve checkpoint aralığı optimize edildi, replikasyon gecikmesi sıfırlandı.") if t4.resolution_summary.blank?
 
 t4.comments.find_or_create_by!(
   author_role: :customer,
@@ -184,5 +188,9 @@ if t6.status_open?
     c.created_at = 5.days.ago + 12.hours
   end
 
-  t6.update_columns(status: Ticket.statuses[:closed], solved_at: 5.days.ago + 12.hours)
+  t6.update_columns(
+    status: Ticket.statuses[:closed],
+    solved_at: 5.days.ago + 12.hours,
+    resolution_summary: "E-posta bildirim şablonundaki tüm eski varlıklar yeni CDN bağlantılarıyla değiştirildi, test gönderimleri onaylandı."
+  )
 end

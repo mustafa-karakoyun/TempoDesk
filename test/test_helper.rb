@@ -5,8 +5,8 @@ require_relative "test_helpers/session_test_helper"
 
 module ActiveSupport
   class TestCase
-    # Run tests in parallel with specified workers
-    parallelize(workers: :number_of_processors, with: :threads)
+    # Run tests in parallel with specified workers (threshold set to 100 to match connection pool)
+    parallelize(workers: :number_of_processors, with: :threads, threshold: 100)
 
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all

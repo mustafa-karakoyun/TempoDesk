@@ -25,7 +25,7 @@ Aşağıdaki tablo, Fortune 500 şirketlerinin genel büyüklük ölçeğini ve 
 
 - **Seçilen SaaS:** Zendesk (Destek ve Bilet Yönetim Platformu)
 - **Kullanan Firma:** Uber Technologies
-- **Müşteri Kanıtı:** Zendesk’in müşteri hikâyesine göre Uber, 2010'dan beri Zendesk Support kullanıyor: [Zendesk Resmi Uber Vaka Analizi](https://www.zendesk.com/customer/uber/)
+- **Müşteri Kanıtı:** Zendesk’in müşteri hikâyesine göre Uber, 2010'dan beri Zendesk Support kullanıyor.: [Zendesk Resmi Uber Vaka Analizi](https://www.zendesk.com/customer/uber/)
 - **Fortune 500 Doğrulaması:** Uber Technologies, Fortune 500 listesinde #92 sıradadır: [Fortune Şirket Profili](https://fortune.com/company/uber-technologies/)
 - **Ek Kurumsal Kanıt:** Siemens Financial Services (600+ lisans): [Siemens Financial Services](https://ultimate.ai/customer-stories/siemens)
 
@@ -34,7 +34,9 @@ Aşağıdaki tablo, Fortune 500 şirketlerinin genel büyüklük ölçeğini ve 
 ## 3. Faz 2 - Maliyet ve Kod Hacmi Tahmini
 
 ### a. Zendesk Satır Sayısı Tahmini ve Yöntem
-- **Referans Açık Kaynak Analizi:** Zendesk mühendisleri Cristian Planas ve Anatoly Mikhaylov, EuRuKo 2024 konuşmasında (13 Eylül 2024, video 18:57-19:02) monolitte ve özel gem'lerde 1,6 milyon satırın üzerinde kod olduğunu söylüyor. Kaynak: [Zendesk EuRuKo 2024](https://www.youtube.com/watch?v=2nmgfVqhfiw&t=1149s)
+- **Referans Açık Kaynak Analizi:** Zendesk mühendisleri Cristian Planas ve Anatoly Mikhaylov, EuRuKo 2024 konuşmasında
+(13 Eylül 2024, video 18:57-19:02) monolitte ve özel gem'lerde 1,6 milyon satırın
+üzerinde kod olduğunu söylüyor. Kaynak: [Zendesk EuRuKo 2024](https://www.youtube.com/watch?v=2nmgfVqhfiw&t=1149s)
 
 ### b. Maliyet ve Süre Tahmini
 
@@ -42,7 +44,7 @@ Aşağıdaki tablo, Fortune 500 şirketlerinin genel büyüklük ölçeğini ve 
 | :--- | :--- | :--- |
 | **Tüm çekirdek (~300k satır): maliyet** | $742 – $2.228 | Yapılmadı (Kapsam dışı tahmin) |
 | **Tüm çekirdek: süre** | 60 – 100 iş günü | Yapılmadı (Kapsam dışı tahmin) |
-| **Aort dilimi (~1.000 satır): maliyet** | $5 – $10 | *[Dashboard kullanım panelinden doldurulacak]* |
+| **Aort dilimi (~1.000 satır): maliyet** | $5 – $10 | *[Dashboard'dan panel tutarı]* |
 | **Aort dilimi: süre** | 2 gün (~14 saat) | *[Başlama-bitiş kayıt süresi]* |
 
 **Varsayımlar:**
@@ -119,12 +121,12 @@ Aort dilimi (*Müşteri bilet açar → Temsilci yanıtlar → Çözülür, çö
 - **Temsilci Ekranları:** SLA sırasına göre otomatik dizilen operasyonel bilet listesi (`/agent/tickets`), detay sayfası, durum aksiyon butonları.
 - **İdempotent Demo Verisi (`db/seeds.rb`):** Tekrar çalıştırıldığında çoğalmayan, SLA senaryolarını (süresi aşılmış acil bilet, zamanında çözülmüş, geç çözülmüş bilet) sergileyen 6 gerçekçi demo bilet.
 - **Görsel Tasarım & Mobil Uyumluluk:** Harici CDN/framework bağımlılığı olmayan saf Vanilla CSS tasarım sistemi; tek satır SLA rozetleri, geç çözülen biletler için sönük "Geç çözüldü" rozeti, dar ekranda (375 px) yatay kaydırma yapmayan duyarlı kart düzeni.
-- **Otomatik Testler:** Model, SLA zaman kuralları (`travel_to`), müşteri ve temsilci akışlarını kapsayan 50 testin tamamı yeşildir.
+- **Otomatik Testler:** Model, SLA zaman kuralları (`travel_to`), müşteri ve temsilci akışları ile çözüm özeti testlerini kapsayan 53 testin tamamı (%100) yeşildir.
 - **GitHub Actions CI (Aşama 7):** `.github/workflows/ci.yml` iş akışı GitHub Actions üzerinde başarıyla çalışmakta ve tüm kontroller (`scan_ruby`, `lint`, `test`, `scan_js`, `system-test`) **%100 yeşil (passing)** olarak doğrulanmaktadır.
+- **Kullanıcı Acısı Çözüm Özelliği (Aşama 8):** G2/Capterra Zendesk incelemelerinde en çok yakınılan "Çözümün nasıl sağlandığı karmaşık mesaj geçmişinde kayboluyor" acısını çözen **Kalıcı Çözüm Özeti (Resolution Summary)** özelliği eklendi. Temsilci bileti çözerken çözüm özeti girebilir; bilet çözüldüğünde bu özet hem müşterinin takip sayfasında hem de temsilci panelinde en üstte belirgin yeşil bilgi kartı olarak sunulur.
 
-### c. Henüz yapılmayanlar (Aşama 7 Deploy & Aşama 8)
-- **Canlı Deploy (Render) (Aşama 7):** Canlı URL henüz yoktur. Render PostgreSQL ve Docker konfigürasyonu insan tarafından yapılacaktır.
-- **Kullanıcı Acısı Özelliği (Aşama 8):** G2/Capterra kullanıcı yorumlarından seçilecek gerçek bir acıyı çözen fark özelliğinin eklenmesi.
+### c. Henüz yapılmayanlar (Yalnızca Render Canlı Deploy)
+- **Canlı Deploy (Render):** Canlı URL henüz yoktur. Render PostgreSQL ve Docker konfigürasyonu insan tarafından panelden yapılacaktır.
 
 ### d. Doğrulanmayanlar ve bilinen konular
 - Render'da `AGENT_PASSWORD`, `DATABASE_URL` ve `RAILS_MASTER_KEY` ayarları, Render'ın ücretsiz planındaki kısıtlar ve `Dockerfile`'ın Render'da çalışıp çalışmadığı henüz canlıda test edilmedi.

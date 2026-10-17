@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_16_122231) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_17_162653) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -44,6 +44,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_122231) do
     t.string "access_token", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "resolution_summary"
     t.index ["access_token"], name: "index_tickets_on_access_token", unique: true
   end
 

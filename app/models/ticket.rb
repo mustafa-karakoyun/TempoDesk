@@ -23,7 +23,7 @@ class Ticket < ApplicationRecord
   validates :priority, :status, :due_at, presence: true
 
   # Durumu yalnızca bu metot değiştirir. İzinsiz geçişte InvalidTransition fırlatır.
-  def transition_to!(new_status)
+  def transition_to!(new_status, resolution_summary: nil)
     new_status = new_status.to_s
     allowed = TRANSITIONS.fetch(status, [])
 
@@ -34,6 +34,7 @@ class Ticket < ApplicationRecord
     attrs = { status: new_status }
     attrs[:solved_at] = Time.current if new_status == "solved"
     attrs[:solved_at] = nil if new_status == "open"
+    attrs[:resolution_summary] = resolution_summary if resolution_summary.present?
     update!(attrs)
   end
 

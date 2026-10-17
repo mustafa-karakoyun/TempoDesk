@@ -20,7 +20,7 @@ module Agent
       new_status = params[:status]
 
       begin
-        @ticket.transition_to!(new_status)
+        @ticket.transition_to!(new_status, resolution_summary: params[:resolution_summary])
         redirect_to agent_ticket_path(@ticket), notice: "Bilet durumu '#{helpers.status_label(@ticket.status)}' olarak güncellendi."
       rescue Ticket::InvalidTransition => e
         redirect_to agent_ticket_path(@ticket), alert: "Geçersiz durum geçişi: #{e.message}"
