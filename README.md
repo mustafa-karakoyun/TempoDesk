@@ -28,8 +28,7 @@ Aşağıdaki tablo, Fortune 500 şirketlerinin genel büyüklük ölçeğini ve 
 - **Fortune 500 Doğrulaması:** Uber Technologies, Fortune 500 listesinde #92 sıradadır: [Fortune Şirket Profili](https://fortune.com/company/uber-technologies/)
 - **Ek Kurumsal Kanıt:** Siemens Financial Services (600+ lisans): [Siemens Financial Services](https://ultimate.ai/customer-stories/siemens)
 
-## Faz 2
-
+---
 
 ## 3. Faz 2 - Maliyet ve Kod Hacmi Tahmini
 
@@ -54,50 +53,81 @@ Aşağıdaki tablo, Fortune 500 şirketlerinin genel büyüklük ölçeğini ve 
 
 ### c. Gerçekleşen Harcama Takibi (Kayıt Defteri)
 - **Başlangıç:** 16 Ekim 2026 14:00
-- **Kullanılan Araç:** Cursor / Claude 3.7
+- **Kullanılan Araç:** Cursor / Antigravity IDE
 - **Harcama Kaydı:** Proje bitiminde kullanım panelinden (Usage Dashboard) ekran görüntüsüyle teyit edilerek doldurulacaktır.
 
 ---
 
-## 4. Yapamadıklarım
+## 4. Kurulum ve Yerel Çalıştırma
 
-> Bu bölüm, yazıldığı andaki gerçek durumu anlatır (16 Ekim 2026, Aşama 0 ve Aşama 1 bitmiş). Bir madde yapıldığında kanıtıyla (test çıktısı, canlı URL) birlikte buradan silinir. Kanıtı olmayan hiçbir şey "çalışıyor" diye yazılmaz.
+### Gereksinimler
+- Ruby 3.4+ / Ruby 4
+- PostgreSQL (yerel servis çalışır durumda olmalı)
+
+### Adımlar (Windows PowerShell)
+```powershell
+# Bağımlılıkları yükleyin
+bundle install
+
+# Veritabanını oluşturun, şemayı yükleyin ve demo verisini yükleyin
+$env:PGPASSWORD = "postgres_sifreniz"
+ruby bin/rails db:create db:migrate db:seed
+
+# Test paketini çalıştırın (50 test, 210 assertion)
+ruby bin/rails test
+
+# Sunucuyu başlatın
+ruby bin/rails server
+```
+
+### Ekranlar ve Erişim
+- **Müşteri Bilet Formu:** `http://localhost:3000/`
+- **Temsilci Girişi:** `http://localhost:3000/session/new`  
+  - *E-posta:* `agent@tempodesk.example`  
+  - *Geliştirme Parolası:* `tempodesk-local-dev`
+- **Temsilci Bilet Sırası:** `http://localhost:3000/agent/tickets`
+- **Sağlık Kontrolü:** `http://localhost:3000/up` (200 OK)
+
+---
+
+## 5. Yapamadıklarım
+
+> Bu bölüm, projenin anayasası gereği gerçek durumu dürüstçe raporlar (17 Ekim 2026 güncel durumu). Kanıtı (test çıktısı, canlı ekran) olmayan hiçbir özellik "çalışıyor" diye raporlanmaz.
 
 ### a. Bilerek kapsam dışı bıraktıklarım
-Aort dilimi (bilet aç → temsilci yanıtla → çöz, çözüm süresi SLA'ya karşı izlenir) dışında kalan şunları yapmadım ve yapmayacağım:
-- Raporlama
-- Canlı sohbet
-- Bilgi bankası / makale
-- Kullanıcı forumu
-- Çoklu dil
-- E-posta bildirimi
+Aort dilimi (*Müşteri bilet açar → Temsilci yanıtlar → Çözülür, çözüm süresi SLA'ya göre izlenir*) dışında kalan ve bilerek eklenmeyen unsurlar:
+- Raporlama ve istatistik panoları
+- Canlı sohbet ve web soketleri
+- Bilgi bankası / yardım makaleleri
+- Kullanıcı topluluk forumu
+- Çoklu dil desteği
+- E-posta bildirimi (canlı e-posta sunucusu bağlanmadığı için sahte özellik bırakılmadı)
 - Parola sıfırlama (e-posta gönderimi olmadan çalışamayacağı için kaldırıldı)
-- Otomatik kapanma (zamanlayıcı)
-- Canlı JavaScript geri sayım
-- Mesai saati / hafta sonu hesabı (SLA yalnızca takvim süresidir)
-- Temsilci atama
-- Çoklu temsilci yönetimi
-- Dosya eki
-- Ödeme / kart akışı
+- Otomatik bilet kapatma zamanlayıcısı
+- Canlı JavaScript geri sayım sayaçları (sunucu taraflı hesaplama tercih edildi)
+- Mesai saati / hafta sonu takvimi hesabı (SLA yalnızca takvim süresidir)
+- Temsilci atama ve çoklu departman hiyerarşisi
+- Dosya eki yükleme
+- Ödeme veya kart bilgisi akışı
 
-### b. Henüz yapılmayanlar (şu anki durum)
-Aşama 0'dan Aşama 6'ya kadar olan tüm çekirdek işlevler tamamlandı:
-- Temsilci kimlik doğrulama akışı
-- `Ticket` ve `Comment` veri modelleri, SLA zaman kuralları (`SlaPolicy`), durum akışı (`transition_to!`)
-- Herkese açık müşteri bilet oluşturma formu (`/`), gizli takip bağlantısı (`/t/:access_token`), müşteri yanıt formu
-- Temsilci bilet listesi (`/agent/tickets`), SLA öncelik sıralaması, bilet detayı (`/agent/tickets/:id`), durum değiştirme aksiyonları ve ilk yanıtta otomatik açılma (`new → open`)
-- 6 adet gerçekçi örnek demo bilet verisi (idempotent seed: süresi dolmuş acil ihlalli bilet, zamanında çözülmüş, yeni, geç çözülmüş ihlalli, düşük öncelikli ve kapatılmış biletler)
-- TempoDesk nabız SVG logosu, favicon (`public/icon.svg`) ve sayfa başlıkları (`<title>`)
-- 50 adet otomatik test (model, SLA `travel_to`, müşteri entegrasyonu, temsilci entegrasyonu) yeşil ve doğrulanmış durumdadır.
+### b. Tamamlananlar (Doğrulanmış Çekirdek Özellikler)
+- **Temsilci Kimlik Doğrulama:** Rails 8 yerleşik oturum akışı (`Session` & `User`).
+- **Veri Modelleri & Güvenlik:** `Ticket` (güvenli `access_token`, ön ekli enum'lar) ve `Comment` ilişkileri.
+- **SLA Motoru (`SlaPolicy`):** Acil (4s), Yüksek (8s), Normal (24s), Düşük (48s) çözüm süreleri tek merkezde. İhlal veritabanında saklanmaz; anlık `Ticket#sla_breached?` ile hesaplanır.
+- **Kontrollü Durum Akışı:** `new → open → solved → closed` geçişleri `Ticket#transition_to!` ile yürütülür, yetkisiz geçişler kullanıcıya anlaşılır hata verir.
+- **İlk Yanıtta Otomatik Açılma:** Temsilcinin yeni bir bilete ilk yanıtında bilet otomatik olarak `new → open` durumuna geçer.
+- **Müşteri Ekranları:** Herkese açık form (`/`), gizli takip bağlantısı (`/t/:access_token`), müşteri yanıt formu.
+- **Temsilci Ekranları:** SLA sırasına göre otomatik dizilen operasyonel bilet listesi (`/agent/tickets`), detay sayfası, durum aksiyon butonları.
+- **İdempotent Demo Verisi (`db/seeds.rb`):** Tekrar çalıştırıldığında çoğalmayan, SLA senaryolarını (süresi aşılmış acil bilet, zamanında çözülmüş, geç çözülmüş bilet) sergileyen 6 gerçekçi demo bilet.
+- **Görsel Tasarım & Mobil Uyumluluk:** Harici CDN/framework bağımlılığı olmayan saf Vanilla CSS tasarım sistemi; tek satır SLA rozetleri, geç çözülen biletler için sönük "Geç çözüldü" rozeti, dar ekranda (375 px) yatay kaydırma yapmayan duyarlı kart düzeni.
+- **Otomatik Testler:** Model, SLA zaman kuralları (`travel_to`), müşteri ve temsilci akışlarını kapsayan 50 testin tamamı yeşildir.
 
-Aşağıdakiler **henüz yapılmamıştır**:
-- GitHub Actions'ta çalışan CI ve README'deki CI rozeti (Aşama 7)
-- Canlı uygulama (Render). **Canlı URL şu an yoktur.** (Aşama 7)
-- Kullanıcı yorumlarından seçilen acıyı çözen fark özelliği (Aşama 8)
+### c. Henüz yapılmayanlar (Aşama 7 & 8)
+- **GitHub Actions CI (Aşama 7):** `.github/workflows/ci.yml` dosyasının GitHub Actions üzerinde yeşil çalıştırılması ve CI rozetinin aktifleşmesi.
+- **Canlı Deploy (Render) (Aşama 7):** Canlı URL henüz yoktur. Render PostgreSQL ve Docker konfigürasyonu yapılacaktır.
+- **Kullanıcı Acısı Özelliği (Aşama 8):** G2/Capterra kullanıcı yorumlarından seçilecek gerçek bir acıyı çözen fark özelliğinin eklenmesi.
 
-### c. Doğrulanmayanlar ve bilinen sorunlar
-- Girişi gerçek tarayıcıda (CSRF koruması açıkken) henüz denemedim. Giriş akışı yalnızca otomatik testle ve CSRF'si kapalı bir betikle denendi.
-- Render'da `AGENT_PASSWORD`, `DATABASE_URL` ve `RAILS_MASTER_KEY` ayarları, Render'ın ücretsiz planındaki kısıtlar ve `Dockerfile`'ın Render'da çalışıp çalışmadığı denenmedi.
-- Ruby 4.0.7 ile Rails'in ürettiği `bin/kamal` çalışmıyor (`fiddle` yüklenemiyor). Deploy Render'da yapılacağı için Kamal kullanılmayacak, ama bu sorun düzeltilmedi.
-- Geliştirme ortamı Windows'tur, deploy ortamı Linux konteynerdir. `Dockerfile` ve `bin/docker-entrypoint` Linux'ta henüz çalıştırılmadı. Yalnızca dosyaların satır sonlarının LF olduğu kontrol edildi.
-- Harcama ve süre kaydı (Bölüm 3.c) henüz doldurulmadı.
+### d. Doğrulanmayanlar ve bilinen konular
+- Render'da `AGENT_PASSWORD`, `DATABASE_URL` ve `RAILS_MASTER_KEY` ayarları, Render'ın ücretsiz planındaki kısıtlar ve `Dockerfile`'ın Render'da çalışıp çalışmadığı henüz canlıda test edilmedi.
+- Ruby 4.0.7 ile Rails'in ürettiği `bin/kamal` çalışmıyor (`fiddle` bağımlılığı). Deploy Render'da Docker ile yapılacağı için Kamal kullanılmayacaktır.
+- Geliştirme ortamı Windows'tur, deploy ortamı Linux konteynerdir. Satır sonlarının LF olduğu `.gitattributes` ile güvenceye alınmıştır.
