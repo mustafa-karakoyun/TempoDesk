@@ -1,7 +1,7 @@
 # TempoDesk
 
 [![CI](https://github.com/mustafa-karakoyun/TempoDesk/actions/workflows/ci.yml/badge.svg)](https://github.com/mustafa-karakoyun/TempoDesk/actions/workflows/ci.yml)
-![Ruby](https://img.shields.io/badge/Ruby-3.3.12-red)
+![Ruby](https://img.shields.io/badge/Ruby-4.0.7-red)
 ![Rails](https://img.shields.io/badge/Rails-8.1.4-red)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 
