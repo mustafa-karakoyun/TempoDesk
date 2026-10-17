@@ -15,6 +15,7 @@
         Bu sayfayı tarayıcınızda yer imlerine ekleyebilir veya bağlantıyı kaydederek dilediğiniz zaman bilet durumunu takip edebilirsiniz.
       </p>
       <div class="secret-link-input-group">
+        <label for="secretLinkInput" class="sr-only">Özel takip bağlantınız</label>
         <input type="text" readonly value="<%= customer_ticket_url(@ticket.access_token) %>" class="form-input secret-input" id="secretLinkInput" onclick="this.select()">
       </div>
     </div>

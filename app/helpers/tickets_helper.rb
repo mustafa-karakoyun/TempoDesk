@@ -1,31 +1,42 @@
 module TicketsHelper
   # Sunucu tarafında üretilen SLA metni. JavaScript sayaç yok.
-  #   ihlal           -> "SLA aşıldı"
-  #   zamanında çözüm -> "SLA içinde çözüldü"
-  #   açık bilet      -> "3 sa 59 dk kaldı"
+  #   çözülmüş, zamanında -> "SLA içinde çözüldü"
+  #   çözülmüş, geç       -> "Geç çözüldü"            (artık açık bir ihlal yok, sönük etiket)
+  #   açık, ihlalli       -> "5 sa 12 dk aşıldı"
+  #   açık, süresi var    -> "3 sa 45 dk kaldı"
   def sla_label(ticket)
-    return "SLA aşıldı" if ticket.sla_breached?
-    return "SLA içinde çözüldü" if ticket.resolved?
+    if ticket.resolved?
+      return ticket.sla_breached? ? "Geç çözüldü" : "SLA içinde çözüldü"
+    end
 
-    total_minutes = ticket.sla_seconds_remaining / 60
-    hours, minutes = total_minutes.divmod(60)
-
-    if total_minutes.zero?
-      "1 dk'dan az kaldı"
-    elsif hours.zero?
-      "#{minutes} dk kaldı"
+    if ticket.sla_breached?
+      "#{sla_duration_text(-ticket.sla_seconds_remaining)} aşıldı"
     else
-      "#{hours} sa #{minutes} dk kaldı"
+      "#{sla_duration_text(ticket.sla_seconds_remaining)} kaldı"
     end
   end
 
   def sla_badge_class(ticket)
-    if ticket.sla_breached?
+    if ticket.resolved?
+      ticket.sla_breached? ? "badge-late" : "badge-resolved"
+    elsif ticket.sla_breached?
       "badge-breached"
-    elsif ticket.resolved?
-      "badge-resolved"
     else
       "badge-active"
+    end
+  end
+
+  # Saniyeyi "1 dk'dan az", "45 dk" veya "3 sa 59 dk" biçiminde yazar.
+  def sla_duration_text(seconds)
+    total_minutes = seconds / 60
+    hours, minutes = total_minutes.divmod(60)
+
+    if total_minutes.zero?
+      "1 dk'dan az"
+    elsif hours.zero?
+      "#{minutes} dk"
+    else
+      "#{hours} sa #{minutes} dk"
     end
   end
 
