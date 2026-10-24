@@ -1,61 +1,87 @@
 <!DOCTYPE html>
 <html lang="tr">
   <head>
-    <title><%= content_for(:title) || "Kâhya" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Kâhya">
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title><%= content_for(:title) || "Kâhya - Kurumsal Harcama Denetim Sistemi" %></title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
-    <%= yield :head %>
 
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    <%= yield :head %>
   </head>
 
   <body>
-    <header class="app-header">
-      <div class="header-container">
-        <a href="<%= root_path %>" class="brand-logo">
-          <!-- Kâhya Anahtar / Key İkonu -->
-          <svg class="brand-key-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m21 2-2 2m-1.5 1.5L16 7l-2-2m-1 3-3 3a5 5 0 1 1-7.07 0 5 5 0 0 1 7.07-7.07l3 3"></path>
-            <circle cx="7.5" cy="16.5" r="1.5"></circle>
-          </svg>
-          <span class="brand-name">Kâhya</span>
-        </a>
+    <!-- Stitch Sabit Başlık (Pure Vanilla CSS) -->
+    <header class="stitch-navbar">
+      <div class="stitch-nav-inner">
+        <!-- Logo & Başlık -->
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <a class="stitch-brand-wrap" href="<%= authenticated? && (current_user&.role_manager? || current_user&.role_cfo?) ? manager_expenses_path : root_path %>">
+            <div class="stitch-logo-badge">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m21 2-2 2m-1.5 1.5L16 7l-2-2m-1 3-3 3a5 5 0 1 1-7.07 0 5 5 0 0 1 7.07-7.07l3 3"></path>
+                <circle cx="7.5" cy="16.5" r="1.5"></circle>
+              </svg>
+            </div>
+            <span class="stitch-brand-title">Kâhya</span>
+          </a>
+          <span class="stitch-brand-subtitle">Yapay Zekâ Destekli Harcama Denetimi</span>
+        </div>
 
-        <nav class="nav-links">
+        <!-- Menü -->
+        <nav class="stitch-nav-menu">
           <% if authenticated? %>
             <% if current_user&.role_manager? || current_user&.role_cfo? %>
-              <a href="<%= manager_expenses_path %>" class="nav-link">Harcamalar</a>
+              <% pending_count = Expense.where(status: :pending_review).count %>
+              <a class="stitch-nav-item <%= request.path.start_with?('/manager/expenses') ? 'active' : '' %>" href="<%= manager_expenses_path %>">
+                <span>Harcamalar</span>
+                <span class="stitch-pill-counter"><%= pending_count %></span>
+              </a>
             <% end %>
-            <a href="<%= agent_tickets_path %>" class="nav-link">Destek</a>
-            <span class="user-badge" style="font-size: 0.85rem; color: var(--slate-600);"><%= current_user&.email_address %></span>
-            <%= button_to "Çıkış Yap", session_path, method: :delete, class: "nav-btn-logout" %>
-          <% else %>
-            <a href="<%= new_session_path %>" class="nav-link nav-link-agent">Giriş Yap</a>
+            <a class="stitch-nav-item" href="<%= agent_tickets_path %>">Destek</a>
           <% end %>
         </nav>
+
+        <!-- Profil & Çıkış -->
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <% if authenticated? %>
+            <div class="stitch-user-profile">
+              <div>
+                <div class="stitch-user-email"><%= current_user&.email_address %></div>
+                <div class="stitch-user-role">
+                  <%= current_user&.role_cfo? ? "CFO / Denetçi" : (current_user&.role_manager? ? "Yönetici / Onay Yetkilisi" : "Temsilci") %>
+                </div>
+              </div>
+              <div class="stitch-user-avatar">
+                <%= current_user&.email_address&.first&.upcase %>
+              </div>
+            </div>
+            <span style="display: inline-block; width: 1px; height: 20px; background: #cbd5e1;"></span>
+            <%= button_to "Çıkış Yap", session_path, method: :delete, class: "stitch-nav-item", style: "background: transparent; border: none; cursor: pointer; color: #dc2626; font-size: 0.8rem; padding: 0.25rem 0.5rem;" %>
+          <% else %>
+            <a class="stitch-nav-item active" href="<%= new_session_path %>" style="background: #0f172a; color: #ffffff; padding: 0.45rem 1rem;">Giriş Yap</a>
+          <% end %>
+        </div>
       </div>
     </header>
 
-    <main class="main-content">
-      <div class="content-container">
+    <!-- Ana İçerik -->
+    <main style="flex: 1; width: 100%;">
+      <div class="stitch-page-wrap">
         <% if flash[:notice].present? %>
-          <div class="flash-message flash-notice">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          <div class="flash-message flash-notice" style="margin-bottom: 1.5rem; padding: 1rem 1.25rem; border-radius: 10px; background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; font-size: 0.875rem; display: flex; align-items: center; gap: 0.75rem;">
+            <span class="material-symbols-outlined" style="font-size: 20px; color: #059669;">check_circle</span>
             <span><%= flash[:notice] %></span>
           </div>
         <% end %>
 
         <% if flash[:alert].present? %>
-          <div class="flash-message flash-alert">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          <div class="flash-message flash-alert" style="margin-bottom: 1.5rem; padding: 1rem 1.25rem; border-radius: 10px; background: #fffbeb; border: 1px solid #fde68a; color: #92400e; font-size: 0.875rem; display: flex; align-items: center; gap: 0.75rem;">
+            <span class="material-symbols-outlined" style="font-size: 20px; color: #d97706;">warning</span>
             <span><%= flash[:alert] %></span>
           </div>
         <% end %>
@@ -64,9 +90,19 @@
       </div>
     </main>
 
-    <footer class="app-footer">
-      <div class="footer-container">
-        <span>Kâhya — Harcama Denetimi &amp; Destek Masası</span>
+    <!-- Stitch Altbilgi -->
+    <footer class="stitch-footer">
+      <div class="stitch-footer-inner">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span>© 2026 Kâhya Finansal Denetim Teknolojileri A.Ş.</span>
+          <span>•</span>
+          <span>Tüm hakları saklıdır.</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1.25rem;">
+          <span style="font-family: var(--font-mono); color: #94a3b8;">v2.4.0-denetim</span>
+          <span>Gizlilik ve Uyum</span>
+          <span>Kurumsal Politika v4.2</span>
+        </div>
       </div>
     </footer>
   </body>

@@ -1,148 +1,219 @@
 <% is_cfo = current_user.role_cfo? %>
 <% content_for :title, (is_cfo ? "CFO Onayı Bekleyenler | Kâhya" : "Harcamalar | Yönetici Paneli | Kâhya") %>
 
-<div class="page-container">
-  <!-- Sayfa Başlığı ve Özet Çubuğu -->
-  <div class="page-header" style="margin-bottom: var(--space-6);">
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: var(--space-4);">
-      <div>
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-          <span class="badge" style="background: <%= is_cfo ? '#f3e8ff' : '#eff4ff' %>; color: <%= is_cfo ? '#6b21a8' : '#1e40af' %>; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">
-            <%= is_cfo ? "CFO Denetim Masası" : "Yönetim Masası" %>
-          </span>
-          <span style="font-size: 0.8rem; color: var(--slate-500);">•</span>
-          <span style="font-size: 0.8rem; color: var(--slate-500);">Yetkili: <%= current_user.email_address %></span>
-        </div>
-        <h1 style="font-size: 1.85rem; font-weight: 700; color: #0f172a; letter-spacing: -0.02em; margin: 0 0 8px 0;">
-          Karar bekleyen harcamalar
-        </h1>
-        <p style="font-size: 0.95rem; color: var(--slate-600); margin: 0; max-width: 720px;">
-          <% if is_cfo %>
-            5.000 TL üzeri yüksek tutarlı ve 24 saat içinde yönetici tarafından karara bağlanmayarak eskale olmuş harcamalar.
-          <% else %>
-            AI politikası tarafından gri alanda değerlendirilen ve yönetici onayı gerektiren harcamalar. 24 saat içinde karar verilmeyen kalemler CFO onayına devredilir.
-          <% end %>
-        </p>
+<div>
+  <!-- Sayfa Başlığı ve Özet Metrikleri -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem;">
+        <span style="display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; background: <%= is_cfo ? '#f3e8ff' : '#eff4ff' %>; color: <%= is_cfo ? '#6b21a8' : '#1e40af' %>;">
+          <%= is_cfo ? "CFO Denetim Masası" : "Yönetim Masası" %>
+        </span>
+        <span style="color: #cbd5e1;">•</span>
+        <span style="font-size: 0.75rem; color: #64748b;">Yetkili: <%= current_user.email_address %></span>
       </div>
+      <h1 style="font-size: 1.85rem; font-weight: 700; color: #0f172a; letter-spacing: -0.02em; margin: 0 0 0.4rem 0;">
+        Karar bekleyen harcamalar
+      </h1>
+      <p style="font-size: 0.9rem; color: #64748b; margin: 0; max-width: 680px; line-height: 1.5;">
+        <% if is_cfo %>
+          5.000 TL üzeri yüksek tutarlı ve 24 saat içinde yönetici tarafından karara bağlanmayarak eskale olmuş harcamalar.
+        <% else %>
+          AI politikası tarafından gri alanda değerlendirilen ve yönetici onayı gerektiren harcamalar. 24 saat içinde karar verilmeyen kalemler CFO onayına devredilir.
+        <% end %>
+      </p>
+    </div>
 
-      <!-- Aksiyon ve Özet Sayaç -->
-      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-        <div style="background: #ffffff; border: 1px solid var(--slate-200); border-radius: var(--radius-md); padding: 10px 18px; box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 10px;">
-          <span style="width: 10px; height: 10px; border-radius: 50%; background: <%= is_cfo ? '#6b21a8' : '#d97706' %>;"></span>
-          <span style="font-size: 0.9rem; color: var(--slate-600);">Bekleyen Harcama:</span>
-          <strong style="font-size: 1.15rem; color: #0f172a;"><%= @expenses.size %></strong>
-        </div>
+    <!-- Aksiyon Butonu -->
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <a href="<%= new_manager_expense_path %>" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.15rem; background: #0f172a; color: #ffffff; border-radius: 8px; font-size: 0.875rem; font-weight: 600; text-decoration: none; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <span class="material-symbols-outlined" style="font-size: 18px;">add_circle</span>
+        <span>+ Canlı Harcama Gir (Test Et)</span>
+      </a>
+    </div>
+  </div>
 
-        <a href="<%= new_manager_expense_path %>" style="background: #0f172a; color: #ffffff; padding: 10px 18px; border-radius: var(--radius-md); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; box-shadow: var(--shadow-sm);">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-          + Canlı Harcama Gir (Test Et)
-        </a>
+  <!-- Özet Bilgi Çubuğu (Stitch Summary Bar) -->
+  <div class="stitch-summary-bar">
+    <div class="stitch-metrics-list">
+      <div class="stitch-metric-item">
+        <span class="stitch-metric-dot <%= is_cfo ? 'purple' : 'amber' %>"></span>
+        <span style="color: #64748b;">Bekleyen:</span>
+        <span class="stitch-metric-value"><%= @expenses.size %> harcama</span>
       </div>
+      <span style="display: inline-block; width: 1px; height: 16px; background: #e2e8f0;"></span>
+
+      <div class="stitch-metric-item">
+        <span class="stitch-metric-dot green"></span>
+        <span style="color: #64748b;">Bugün otomatik onaylanan:</span>
+        <span class="stitch-metric-value"><%= Expense.where(status: :approved, decided_by: "llm").where("created_at >= ?", Time.current.beginning_of_day).count %> harcama</span>
+      </div>
+      <span style="display: inline-block; width: 1px; height: 16px; background: #e2e8f0;"></span>
+
+      <div class="stitch-metric-item">
+        <span class="material-symbols-outlined" style="font-size: 18px; color: #94a3b8;">timelapse</span>
+        <span style="color: #64748b;">Eskalasyon kuralı:</span>
+        <span class="stitch-metric-value">24 saat</span>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: #475569; background: #eff4ff; padding: 0.35rem 0.75rem; border-radius: 6px;">
+      <span class="material-symbols-outlined" style="font-size: 16px; color: #2563eb;">verified_user</span>
+      <span>Maksimum gecikme kuralı aktif</span>
     </div>
   </div>
 
   <!-- Harcama Kartları Listesi -->
   <% if @expenses.empty? %>
     <!-- Boş Durum (Empty State) -->
-    <div class="card" style="text-align: center; padding: var(--space-8) var(--space-4); background: #ffffff; border: 1px dashed var(--slate-300);">
-      <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--slate-100); display: inline-flex; align-items: center; justify-content: center; margin-bottom: var(--space-3); color: var(--slate-500);">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="20 6 9 17 4 12"></polyline>
-        </svg>
+    <div style="background: #ffffff; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 3rem 1.5rem; text-align: center;">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: #f1f5f9; color: #64748b; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+        <span class="material-symbols-outlined" style="font-size: 28px;">check_circle</span>
       </div>
-      <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-bottom: 6px;">Karar Bekleyen Harcama Yok</h2>
-      <p style="font-size: 0.95rem; color: var(--slate-600); margin: 0; max-width: 480px; margin: 0 auto;">
-        Şu anda onayınızı bekleyen herhangi bir harcama bulunmamaktadır. Yeni harcamalar API üzerinden iletildiğinde burada listelenecektir.
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin: 0 0 0.5rem 0;">
+        <%= is_cfo ? "CFO Onayı Bekleyen Harcama Yok" : "Tebrikler! Karar Bekleyen Harcama Yok" %>
+      </h3>
+      <p style="font-size: 0.875rem; color: #64748b; margin: 0 0 1.5rem 0;">
+        Şu anda karar havuzunda bekleyen harcama bulunmamaktadır.
       </p>
+      <a href="<%= new_manager_expense_path %>" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.55rem 1.25rem; background: #0f172a; color: #ffffff; border-radius: 8px; font-size: 0.85rem; font-weight: 600; text-decoration: none;">
+        <span class="material-symbols-outlined" style="font-size: 16px;">add</span>
+        <span>Test Harcaması Gönder</span>
+      </a>
     </div>
   <% else %>
-    <div class="expense-cards-list">
+    <div class="stitch-cards-grid">
       <% @expenses.each do |expense| %>
-        <article class="expense-card <%= 'expense-card-escalated' if expense.escalated? %>">
-          <!-- Üst Durum Çubuğu -->
-          <% if expense.escalated? %>
-            <div class="card-escalated-bar">
-              <span style="display: inline-flex; align-items: center; gap: 6px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="13 17 18 12 13 7"></polyline><polyline points="6 17 11 12 6 7"></polyline></svg>
-                Eskale edildi: CFO
+        <% is_escalated = expense.escalated? %>
+        <% risk = expense.risk_score || 0 %>
+        <% risk_class = risk >= 75 ? "high" : (risk >= 40 ? "medium" : "low") %>
+        <% risk_text_color = risk >= 75 ? "#ba1a1a" : (risk >= 40 ? "#b45309" : "#15803d") %>
+
+        <article class="stitch-card <%= is_escalated ? 'escalated' : '' %>">
+          <% if is_escalated %>
+            <!-- Eskale Header Bar -->
+            <div class="stitch-escalation-banner">
+              <div style="display: flex; align-items: center; gap: 0.6rem;">
+                <span class="stitch-escalation-badge">
+                  <span class="material-symbols-outlined" style="font-size: 14px;">forward</span>
+                  Eskale edildi: CFO
+                </span>
+                <span style="font-size: 0.75rem; color: #6b21a8; font-weight: 500;">
+                  24 saatlik inceleme süresi aşıldığı için otomatik CFO onayına devredildi
+                </span>
+              </div>
+              <span style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600; color: #6b21a8;">
+                ID: EXP-<%= expense.id.to_s.rjust(4, '0') %>
               </span>
-              <span style="font-size: 0.8rem; opacity: 0.85;">24 saatlik inceleme süresi aşımı nedeniyle devredildi</span>
-            </div>
-          <% else %>
-            <div class="card-pending-bar">
-              <span style="display: inline-flex; align-items: center; gap: 6px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                <%= escalation_label(expense) %>
-              </span>
-              <span style="font-size: 0.8rem; opacity: 0.85;">Yönetici Onayı Bekliyor</span>
             </div>
           <% end %>
 
-          <!-- Kart Gövdesi -->
-          <div class="expense-card-body">
-            <!-- Satıcı ve Tutar Satırı -->
-            <div class="expense-card-header">
-              <div>
-                <h2 class="expense-merchant-title"><%= expense.merchant %></h2>
-                <div class="expense-meta">
-                  <span class="badge" style="background: var(--slate-100); color: var(--slate-700); font-weight: 600;"><%= expense.category %></span>
-                  <span>•</span>
-                  <span><%= l(expense.spent_on, format: :long) rescue expense.spent_on.to_s %></span>
-                  <span>•</span>
-                  <span>Gönderen: <strong><%= expense.submitted_by %></strong></span>
+          <!-- Kart Ana Gövdesi -->
+          <div class="stitch-card-body">
+            <!-- Üst Satır -->
+            <div class="stitch-card-top-row">
+              <div class="stitch-merchant-group">
+                <div class="stitch-category-icon-box">
+                  <% icon = case expense.category.to_s.downcase
+                            when /yemek/ then "restaurant"
+                            when /seyahat/ then "flight_takeoff"
+                            when /donanım/ then "desktop_windows"
+                            when /ofis/ then "inventory_2"
+                            when /yazılım/ then "code"
+                            else "payments"
+                            end %>
+                  <span class="material-symbols-outlined" style="font-size: 24px;"><%= icon %></span>
+                </div>
+                <div>
+                  <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+                    <h2 class="stitch-merchant-title"><%= expense.merchant %></h2>
+                    <span class="stitch-category-tag"><%= expense.category %></span>
+                    <span style="font-size: 0.75rem; color: #64748b;">
+                      Masraf Sahibi: <strong style="color: #0f172a;"><%= expense.submitted_by %></strong>
+                    </span>
+                  </div>
+                  <p style="font-size: 0.875rem; color: #475569; margin: 0.4rem 0 0 0; line-height: 1.5;">
+                    <%= expense.description %>
+                  </p>
                 </div>
               </div>
-              <div class="expense-amount-lg">
-                <%= expense_amount_tag(expense) %>
+
+              <!-- Tutar -->
+              <div>
+                <div style="font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; text-align: right; margin-bottom: 2px;">
+                  Harcama Tutarı
+                </div>
+                <div class="stitch-amount-display">
+                  <%= expense_amount_tag(expense) %>
+                </div>
               </div>
             </div>
 
-            <!-- Harcama Açıklaması -->
-            <div class="expense-description-text">
-              <%= expense.description %>
+            <!-- AI Politikası Analiz Paneli -->
+            <div class="stitch-ai-panel">
+              <div class="stitch-ai-panel-header">
+                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                  <span class="material-symbols-outlined" style="font-size: 20px; color: #d97706;">psychology</span>
+                  <span style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">AI Politikası Analizi</span>
+                </div>
+
+                <div class="stitch-risk-meter">
+                  <span style="font-size: 0.8rem; font-weight: 700; color: <%= risk_text_color %>;">Risk: <%= risk %> / 100</span>
+                  <div class="stitch-risk-track">
+                    <div class="stitch-risk-bar-fill <%= risk_class %>" style="width: <%= [risk, 100].min %>%;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                <% if expense.policy_clause.present? %>
+                  <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 600; color: #0f172a;">
+                    <span class="material-symbols-outlined" style="font-size: 16px; color: #64748b;">rule</span>
+                    <span><%= expense.policy_clause %></span>
+                  </div>
+                <% end %>
+
+                <div style="display: flex; align-items: flex-start; gap: 0.4rem; font-size: 0.8rem; color: #475569; line-height: 1.45;">
+                  <span class="material-symbols-outlined" style="font-size: 16px; color: #64748b; margin-top: 1px;">info</span>
+                  <p class="stitch-ai-text"><%= expense.llm_reason.presence || "Harcama sisteme iletildi." %></p>
+                </div>
+              </div>
             </div>
 
-            <!-- Yapay Zekâ Denetim Kutusu -->
-            <div class="llm-review-card">
-              <div class="llm-review-header">
-                <span style="display: flex; align-items: center; gap: 6px; color: #0f172a;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                  Yapay Zekâ Denetim Notu
-                  <% if expense.policy_clause.present? %>
-                    <span style="font-size: 0.8rem; font-weight: 600; color: #64748b;">(<%= expense.policy_clause %>)</span>
-                  <% end %>
-                </span>
+            <!-- Alt Alan: Süre ve Karar Butonları -->
+            <div class="stitch-card-actions">
+              <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem;">
+                <% if is_escalated %>
+                  <span class="material-symbols-outlined" style="font-size: 18px; color: #6b21a8;">lock_clock</span>
+                  <span style="color: #6b21a8; font-weight: 700;">Süre doldu (CFO yetkisinde)</span>
+                <% else %>
+                  <span class="material-symbols-outlined" style="font-size: 18px; color: #d97706;">hourglass_top</span>
+                  <span style="color: #475569; font-weight: 500;">İnceleme süresi: <%= l(expense.review_due_at, format: :short) %> tarihine kadar</span>
+                <% end %>
+              </div>
 
-                <% if expense.risk_score.present? %>
-                  <% risk_class = expense.risk_score >= 70 ? 'risk-high' : (expense.risk_score >= 30 ? 'risk-medium' : 'risk-low') %>
-                  <span class="risk-badge <%= risk_class %>">
-                    Risk Skoru: <%= expense.risk_score %>/100
+              <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+                <a href="<%= manager_expense_path(expense) %>" class="stitch-btn-detail">
+                  <span class="material-symbols-outlined" style="font-size: 16px;">visibility</span>
+                  <span>Detay & Denetim İzi</span>
+                </a>
+
+                <% if (is_cfo && expense.effective_approver_role == "cfo") || (!is_cfo && expense.effective_approver_role == "manager") %>
+                  <%= button_to decision_manager_expense_path(expense), method: :patch, params: { decision: "reject" }, class: "stitch-btn-reject" do %>
+                    <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
+                    <span>Reddet</span>
+                  <% end %>
+
+                  <%= button_to decision_manager_expense_path(expense), method: :patch, params: { decision: "approve" }, class: "stitch-btn-approve" do %>
+                    <span class="material-symbols-outlined" style="font-size: 16px;">check</span>
+                    <span>Onayla</span>
+                  <% end %>
+                <% else %>
+                  <span style="font-size: 0.75rem; color: #94a3b8; font-style: italic;">
+                    Bu aşamada karar yetkisi: <%= expense.effective_approver_role.upcase %>
                   </span>
                 <% end %>
               </div>
-              <p style="margin: 0; color: var(--slate-700); line-height: 1.45;">
-                <%= expense.llm_reason.presence || "Değerlendirme notu bulunmuyor." %>
-              </p>
-            </div>
-
-            <!-- Aksiyon Butonları -->
-            <div class="expense-card-actions">
-              <div style="display: flex; align-items: center; gap: var(--space-3);">
-                <!-- Tek Tık Onay Butonu -->
-                <%= button_to decision_manager_expense_path(expense, decision: :approve), method: :patch, class: "btn-approve", form: { style: "display:inline;" } do %>
-                  Onayla
-                <% end %>
-
-                <!-- Tek Tık Ret Butonu -->
-                <%= button_to decision_manager_expense_path(expense, decision: :reject), method: :patch, class: "btn-reject", form: { style: "display:inline;" } do %>
-                  Reddet
-                <% end %>
-              </div>
-
-              <!-- İncele & Denetim İzi Linki -->
-              <a href="<%= manager_expense_path(expense) %>" class="btn btn-secondary btn-sm" style="text-decoration: none;">
-                İncele &amp; Denetim İzi →
-              </a>
             </div>
           </div>
         </article>
