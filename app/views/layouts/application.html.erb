@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="tr">
   <head>
-    <title><%= content_for(:title) || "TempoDesk" %></title>
+    <title><%= content_for(:title) || "Kâhya" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="TempoDesk">
+    <meta name="application-name" content="Kâhya">
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -21,11 +21,12 @@
     <header class="app-header">
       <div class="header-container">
         <a href="<%= root_path %>" class="brand-logo">
-          <!-- TempoDesk Nabız / Pulse İkonu -->
-          <svg class="pulse-icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          <!-- Kâhya Anahtar / Key İkonu -->
+          <svg class="brand-key-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m21 2-2 2m-1.5 1.5L16 7l-2-2m-1 3-3 3a5 5 0 1 1-7.07 0 5 5 0 0 1 7.07-7.07l3 3"></path>
+            <circle cx="7.5" cy="16.5" r="1.5"></circle>
           </svg>
-          <span class="brand-name">Tempo<span class="brand-highlight">Desk</span></span>
+          <span class="brand-name">Kâhya</span>
         </a>
 
         <nav class="nav-links">
@@ -62,7 +63,7 @@
 
     <footer class="app-footer">
       <div class="footer-container">
-        <span>TempoDesk — Kurumsal Destek &amp; SLA Yönetimi</span>
+        <span>Kâhya — Harcama Denetimi &amp; Destek Masası</span>
       </div>
     </footer>
   </body>

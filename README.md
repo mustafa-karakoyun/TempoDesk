@@ -1,11 +1,11 @@
-# TempoDesk
+# Kâhya (Eski Adı: TempoDesk)
 
 [![CI](https://github.com/mustafa-karakoyun/TempoDesk/actions/workflows/ci.yml/badge.svg)](https://github.com/mustafa-karakoyun/TempoDesk/actions/workflows/ci.yml)
 ![Ruby](https://img.shields.io/badge/Ruby-4.0.7-red)
 ![Rails](https://img.shields.io/badge/Rails-8.1.4-red)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 
->**İlham Kaynağı:** Zendesk Support (Bilet yaşam döngüsü ve SLA kurallarının yalınlaştırılmış Rails 8 aort uygulaması) 
+> **Kâhya:** AI Agent Harcama Denetimi & SLA Destek Platformu (Eski adı TempoDesk)  
 > **Teknoloji:** Ruby on Rails 8, PostgreSQL, Minitest, Sade ERB + Vanilla CSS  
 > **Canlı Uygulama (Render):** [https://tempodesk.onrender.com/](https://tempodesk.onrender.com/)  
 > **GitHub Deposu:** [https://github.com/mustafa-karakoyun/TempoDesk](https://github.com/mustafa-karakoyun/TempoDesk)

@@ -2,7 +2,7 @@ require "test_helper"
 
 class Agent::TicketsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @user = User.take || User.create!(email_address: "test_agent@tempodesk.example", password: "password123")
+    @user = User.take || User.create!(email_address: "test_agent@kahya.example", password: "password123")
     @ticket = Ticket.create!(
       title: "Sunucu Yanıt Vermiyor",
       description: "Ana sunucuda kesinti yaşanıyor.",

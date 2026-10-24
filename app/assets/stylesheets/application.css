@@ -156,18 +156,18 @@ body {
   white-space: nowrap;
 }
 
-.pulse-icon {
-  color: var(--primary-600);
+.brand-key-icon {
+  color: var(--amber-600);
   flex: none;
   transition: transform 0.2s ease;
 }
 
-.brand-logo:hover .pulse-icon {
-  transform: scale(1.08);
+.brand-logo:hover .brand-key-icon {
+  transform: rotate(-12deg) scale(1.08);
 }
 
 .brand-highlight {
-  color: var(--primary-600);
+  color: var(--amber-600);
 }
 
 .nav-links {

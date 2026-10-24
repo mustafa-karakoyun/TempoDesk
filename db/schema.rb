@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_17_162653) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_24_200620) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -22,6 +22,36 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_17_162653) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["ticket_id"], name: "index_comments_on_ticket_id"
+  end
+
+  create_table "expense_events", force: :cascade do |t|
+    t.bigint "expense_id", null: false
+    t.string "actor", null: false
+    t.string "action", null: false
+    t.text "reason"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expense_id"], name: "index_expense_events_on_expense_id"
+  end
+
+  create_table "expenses", force: :cascade do |t|
+    t.integer "amount_cents", null: false
+    t.string "merchant", null: false
+    t.string "category", null: false
+    t.text "description", null: false
+    t.date "spent_on", null: false
+    t.string "submitted_by", null: false
+    t.integer "status", default: 0, null: false
+    t.integer "approver_role", null: false
+    t.datetime "review_due_at", null: false
+    t.string "verdict"
+    t.integer "risk_score"
+    t.string "policy_clause"
+    t.text "llm_reason"
+    t.string "decided_by"
+    t.datetime "decided_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -53,9 +83,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_17_162653) do
     t.string "password_digest", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "role", default: 0, null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
   add_foreign_key "comments", "tickets"
+  add_foreign_key "expense_events", "expenses"
   add_foreign_key "sessions", "users"
 end

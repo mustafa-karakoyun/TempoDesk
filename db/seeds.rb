@@ -3,32 +3,39 @@
 # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
 
 # ------------------------------------------------------------------------------
-# 1. Demo Temsilci Hesabı
+# 1. Demo Kullanıcı Hesapları (Kâhya)
 # ------------------------------------------------------------------------------
-# Şifre ENV["AGENT_PASSWORD"]'dan gelir.
-# Production'da değişken yoksa seed KeyError ile durur (bilinen bir varsayılan şifreyle canlı hesap açılmasın).
-# Yerel varsayılan yalnızca development ve test içindir.
-agent_password =
-  if Rails.env.production?
-    ENV.fetch("AGENT_PASSWORD")
-  else
-    ENV.fetch("AGENT_PASSWORD", "tempodesk-local-dev")
-  end
+# Şifreler ENV'den gelir (production'da zorunlu, yerelde güvenli varsayılan).
+agent_password = Rails.env.production? ? ENV.fetch("AGENT_PASSWORD") : ENV.fetch("AGENT_PASSWORD", "kahya-local-dev")
+manager_password = Rails.env.production? ? ENV.fetch("MANAGER_PASSWORD") : ENV.fetch("MANAGER_PASSWORD", "kahya-local-dev")
+cfo_password = Rails.env.production? ? ENV.fetch("CFO_PASSWORD") : ENV.fetch("CFO_PASSWORD", "kahya-local-dev")
 
-User.find_or_create_by!(email_address: "agent@tempodesk.example") do |user|
-  user.password = agent_password
+# Mevcut temsilci hesabını taşı (idempotent, ikinci kullanıcı oluşmaz):
+old_agent = User.find_by(email_address: "agent@tempodesk.example")
+old_agent&.update!(email_address: "agent@kahya.example")
+
+agent_user = User.find_or_create_by!(email_address: "agent@kahya.example") do |u|
+  u.password = agent_password
+  u.role = :agent
 end
+agent_user.update_column(:role, User.roles[:agent]) if agent_user.role.blank?
+
+manager_user = User.find_or_create_by!(email_address: "manager@kahya.example") do |u|
+  u.password = manager_password
+  u.role = :manager
+end
+manager_user.update_column(:role, User.roles[:manager]) unless manager_user.role_manager?
+
+cfo_user = User.find_or_create_by!(email_address: "cfo@kahya.example") do |u|
+  u.password = cfo_password
+  u.role = :cfo
+end
+cfo_user.update_column(:role, User.roles[:cfo]) unless cfo_user.role_cfo?
 
 # ------------------------------------------------------------------------------
-# 2. Örnek Destek Biletleri (Aşama 6 Kriterleri)
+# 2. Örnek Destek Biletleri (Geriye Dönük Uyumluluk)
 # ------------------------------------------------------------------------------
-# Kurallar:
-# (1) find_or_create_by! ile idempotent (tekrar çalıştırıldığında kayıt çoğalmaz).
-# (2) Süresi dolmuş biletlerde created_at ve due_at açıkça verilir (SlaPolicy.due_at(..., from: X.days.ago)).
-# (3) Seed içinde travel_to kullanılmaz.
-
 # Bilet 1: Acil & Süresi Dolmuş (SLA İhlali - Açık)
-# 2 gün önce açılmış, 4 saatlik SLA süresi dolmuş, listede kırmızı SLA ihlali rozetiyle en başta görünmeli.
 t1 = Ticket.find_or_create_by!(title: "Ödeme Geçidi Kesintisi (SLA İhlali)") do |t|
   t.description = "Müşterilerimiz ödeme aşamasında 500 sunucu hatası alıyor. Kart çekim işlemleri tamamen durdu, acil müdahale gerekiyor."
   t.customer_email = "ayse.yilmaz@fintech.example"
@@ -55,7 +62,6 @@ t1.comments.find_or_create_by!(
 end
 
 # Bilet 2: Yüksek Öncelikli & Zamanında Çözülmüş (SLA İhlalsiz)
-# 1 gün önce açılmış, 8 saatlik SLA taahhüdü var, 3 saatte çözülmüş (yeşil SLA rozeti).
 t2 = Ticket.find_or_create_by!(title: "Kullanıcı Yetkilendirme ve Rol Hatası") do |t|
   t.description = "Yeni eklenen departman yöneticileri yönetim paneline erişirken 403 Forbidden alıyor."
   t.customer_email = "mehmet.kaya@holding.example"
@@ -84,8 +90,7 @@ t2.comments.find_or_create_by!(
   c.created_at = 1.day.ago + 3.hours
 end
 
-# Bilet 3: Normal Öncelikli & Yeni Açılmış (Temsilci Henüz Yanıtlamamış)
-# 2 saat önce açılmış, 24 saatlik SLA taahhüdü var, 22 saati kalmış (Yeni durumu).
+# Bilet 3: Normal Öncelikli & Yeni Açılmış
 t3 = Ticket.find_or_create_by!(title: "Fatura Bilgisi ve Unvan Güncelleme Talebi") do |t|
   t.description = "Şirketimizin resmi unvanı ve vergi dairesi değişti. Sonraki faturaların yeni şirket unvanına kesilmesini istiyoruz."
   t.customer_email = "muhasebe@tedarik.example"
@@ -103,8 +108,7 @@ t3.comments.find_or_create_by!(
   c.created_at = 2.hours.ago + 2.minutes
 end
 
-# Bilet 4: Acil & Çözülmüş-Geç (SLA İhlalli Çözüm)
-# 3 gün önce açılmış, 4 saatlik SLA taahhüdü var, 10 saatte çözülmüş (kırmızı 'geç çözüldü' rozeti).
+# Bilet 4: Acil & Çözülmüş-Geç
 t4 = Ticket.find_or_create_by!(title: "Veritabanı Replikasyon Gecikmesi") do |t|
   t.description = "İkincil PostgreSQL düğümünde 45 dakikalık replikasyon gecikmesi oluştu, okuma sorguları eski veri dönüyor."
   t.customer_email = "devops@bulut.example"
@@ -133,8 +137,7 @@ t4.comments.find_or_create_by!(
   c.created_at = 3.days.ago + 10.hours
 end
 
-# Bilet 5: Düşük Öncelikli & Açık (Bolca Süresi Olan Bilet)
-# 6 saat önce açılmış, 48 saatlik SLA süresi var, ~42 saati kalmış (Açık durumu).
+# Bilet 5: Düşük Öncelikli & Açık
 t5 = Ticket.find_or_create_by!(title: "Karanlık Tema Tercihi Önerisi") do |t|
   t.description = "Gece vardiyasında çalışan destek ekiplerimiz için arayüze koyu tema seçeneği getirilmesini rica ediyoruz."
   t.customer_email = "selin.tas@tasarim.example"
@@ -161,7 +164,6 @@ t5.comments.find_or_create_by!(
 end
 
 # Bilet 6: Normal Öncelikli & Kapatılmış Bilet
-# 5 gün önce açılmış, çözülmüş ve sonrasında kapatılmış bilet (artık yeni yanıt eklenemez).
 t6 = Ticket.find_or_create_by!(title: "E-Posta Bildirim Şablonu Güncellemesi") do |t|
   t.description = "Eski kurumsal logomuz bildirim e-postalarında kalmış, yenilendi."
   t.customer_email = "iletisim@ajans.example"
@@ -193,4 +195,146 @@ if t6.status_open?
     solved_at: 5.days.ago + 12.hours,
     resolution_summary: "E-posta bildirim şablonundaki tüm eski varlıklar yeni CDN bağlantılarıyla değiştirildi, test gönderimleri onaylandı."
   )
+end
+
+# ------------------------------------------------------------------------------
+# 3. Kâhya Harcama Denetimi Sentetik Verileri (Faz 1)
+# ------------------------------------------------------------------------------
+# 1. Otomatik Onaylı (Tutar limiti altı, düşük risk, LLM tarafından onaylanmış)
+e1 = Expense.find_or_create_by!(
+  merchant: "OfisDepo Kırtasiye Ltd.",
+  category: "Ofis Malzemeleri",
+  amount_cents: 45_000
+) do |e|
+  e.description = "Temsilci ve operasyon ekibi için ergonomik klavye ve fare seti alımı"
+  e.spent_on = 2.days.ago.to_date
+  e.submitted_by = "ProcurementBot"
+  e.status = :approved
+  e.approver_role = :manager
+  e.review_due_at = ExpensePolicy.review_due_at(from: 2.days.ago)
+  e.verdict = "approve"
+  e.risk_score = 8
+  e.policy_clause = "Madde 1: Ofis sarf malzemeleri 1.000 TL altında doğrudan onaylanır"
+  e.llm_reason = "Harcama tutarı otomatik onay sınırının altında ve onaylı kategoriye uygundur."
+  e.decided_by = "llm"
+  e.decided_at = 2.days.ago + 5.minutes
+  e.created_at = 2.days.ago
+end
+
+e1.expense_events.find_or_create_by!(
+  actor: "llm",
+  action: "approved"
+) do |ev|
+  ev.reason = "Politika kuralı gereği otomatik onaylandı"
+  ev.created_at = 2.days.ago + 5.minutes
+end
+
+# 2. Gri Alanda Bekleyen (Yönetici İncelemesinde, Süresi Var)
+e2 = Expense.find_or_create_by!(
+  merchant: "Akdeniz Balıkçısı",
+  category: "Temsil ve Ağırlama",
+  amount_cents: 280_000
+) do |e|
+  e.description = "Yurt dışı iş ortağı teknik heyeti ile akşam yemeği"
+  e.spent_on = Date.current
+  e.submitted_by = "TravelAgent"
+  e.status = :pending_review
+  e.approver_role = :manager
+  e.review_due_at = ExpensePolicy.review_due_at(from: 4.hours.ago)
+  e.verdict = "flag"
+  e.risk_score = 62
+  e.policy_clause = "Madde 4: Temsil ve ağırlama harcamalarında kişi başı limit aşımı yönetici incelemesi gerektirir"
+  e.llm_reason = "Kişi başı harcama limiti sınırda görüldü, harcamanın iş gerekçesi yönetici tarafından incelenmeli."
+  e.created_at = 4.hours.ago
+end
+
+e2.expense_events.find_or_create_by!(
+  actor: "agent",
+  action: "submitted"
+) do |ev|
+  ev.reason = "API üzerinden harcama iletildi, LLM inceleme için bayrak ekledi"
+  ev.created_at = 4.hours.ago
+end
+
+# 3. 30 Saat Önce Açılıp Eskale Olmuş (CFO'ya Eskale, review_due_at açıkça verilir)
+e3 = Expense.find_or_create_by!(
+  merchant: "Amazon Web Services",
+  category: "Bulut Altyapısı",
+  amount_cents: 350_000
+) do |e|
+  e.description = "Geliştirme ortamı GPU sunucu rezervasyon taahhüt ücreti"
+  e.spent_on = 2.days.ago.to_date
+  e.submitted_by = "DevOpsAgent"
+  e.status = :pending_review
+  e.approver_role = :manager
+  e.created_at = 30.hours.ago
+  e.review_due_at = 6.hours.ago # 30 hours ago + 24 hours = 6 hours ago
+  e.verdict = "flag"
+  e.risk_score = 58
+  e.policy_clause = "Madde 6: Rezervasyon harcamalarında taahhüt süresi incelemesi"
+  e.llm_reason = "Yıllık taahhüt içerdiğinden yönetici onayına yönlendirildi; süre dolumu nedeniyle CFO eskalasyonuna girdi."
+end
+
+e3.expense_events.find_or_create_by!(
+  actor: "agent",
+  action: "submitted"
+) do |ev|
+  ev.reason = "API üzerinden harcama iletildi"
+  ev.created_at = 30.hours.ago
+end
+
+# 4. Yüksek Tutarlı Doğrudan CFO'ya Giden (Tutar CFO Eşiği Üzerinde)
+e4 = Expense.find_or_create_by!(
+  merchant: "Apple Yetkili Satıcı",
+  category: "Donanım",
+  amount_cents: 850_000
+) do |e|
+  e.description = "Yeni baş mühendis için MacBook Pro iş istasyonu alımı"
+  e.spent_on = Date.current
+  e.submitted_by = "ITSupportBot"
+  e.status = :pending_review
+  e.approver_role = :cfo
+  e.review_due_at = ExpensePolicy.review_due_at(from: 2.hours.ago)
+  e.verdict = "flag"
+  e.risk_score = 74
+  e.policy_clause = "Madde 2: 5.000 TL üzeri harcamalar doğrudan CFO onayına tabidir"
+  e.llm_reason = "Tutar doğrudan CFO onay sınırının üzerinde olduğundan üst kurula yönlendirildi."
+  e.created_at = 2.hours.ago
+end
+
+e4.expense_events.find_or_create_by!(
+  actor: "agent",
+  action: "submitted"
+) do |ev|
+  ev.reason = "API üzerinden harcama iletildi, CFO onayına yönlendirildi"
+  ev.created_at = 2.hours.ago
+end
+
+# 5. Reddedilmiş Harcama (Yönetici Tarafından Reddedilmiş)
+e5 = Expense.find_or_create_by!(
+  merchant: "Steam Oyun Mağazası",
+  category: "Yazılım",
+  amount_cents: 180_000
+) do |e|
+  e.description = "Ekip içi cuma günü oyun seansı için çok oyunculu lisans alımı"
+  e.spent_on = 3.days.ago.to_date
+  e.submitted_by = "TeamLeadBot"
+  e.status = :rejected
+  e.approver_role = :manager
+  e.review_due_at = ExpensePolicy.review_due_at(from: 3.days.ago)
+  e.verdict = "flag"
+  e.risk_score = 92
+  e.policy_clause = "Madde 8: Şirket kredi kartıyla eğlence ve oyun yazılımı alımı yasaktır"
+  e.llm_reason = "Kişisel eğlence amaçlı harcama tespiti."
+  e.decided_by = "manager"
+  e.decided_at = 2.days.ago + 1.hour
+  e.created_at = 3.days.ago
+end
+
+e5.expense_events.find_or_create_by!(
+  actor: "manager",
+  action: "rejected"
+) do |ev|
+  ev.reason = "Şirket politikasının 8. maddesi uyarınca eğlence harcamaları onaylanamaz"
+  ev.created_at = 2.days.ago + 1.hour
 end
