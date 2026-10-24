@@ -16,5 +16,9 @@ Rails.application.routes.draw do
     end
   end
 
+  namespace :api do
+    resources :expenses, only: [ :create ]
+  end
+
   get "up" => "rails/health#show", as: :rails_health_check
 end

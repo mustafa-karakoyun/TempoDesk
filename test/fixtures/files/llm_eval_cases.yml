@@ -1,0 +1,139 @@
+- id: case_1
+  description: "Temsilci ekibi için 5 top A4 fotokopi kağıdı ve tükenmez kalem alımı"
+  amount_cents: 45000
+  merchant: "Ofis Kırtasiye Ltd."
+  category: "Ofis Malzemeleri"
+  spent_on: "2026-10-21"
+  submitted_by: "OfficeBot"
+  expected_verdict: "approve"
+  note: "Madde 1: 1.000 TL altı ofis sarf malzemesi"
+
+- id: case_2
+  description: "Cuma akşamı ekip için Steam oyun mağazasından çok oyunculu oyun lisansları"
+  amount_cents: 120000
+  merchant: "Steam Valve Corp"
+  category: "Yazılım"
+  spent_on: "2026-10-23"
+  submitted_by: "GamingLead"
+  expected_verdict: "flag"
+  note: "Madde 8: Kişisel eğlence ve oyun yazılımı alımı yasak"
+
+- id: case_3
+  description: "Aylık GitHub Enterprise ve CI/CD ek işlemci dakikası aboneliği"
+  amount_cents: 85000
+  merchant: "GitHub Inc."
+  category: "Yazılım / SaaS"
+  spent_on: "2026-10-20"
+  submitted_by: "DevOpsBot"
+  expected_verdict: "approve"
+  note: "Madde 3: İş amaçlı onaylı SaaS lisansı ve 1.000 TL altı"
+
+- id: case_4
+  description: "Pazar gecesi lüks eğlence kulübünde VIP masa ve içki harcaması"
+  amount_cents: 380000
+  merchant: "Boğaz Lounge & Club"
+  category: "Temsil ve Ağırlama"
+  spent_on: "2026-10-18"
+  submitted_by: "SalesAgent"
+  expected_verdict: "flag"
+  note: "Madde 4, 8 ve 9: Hafta sonu alkol/eğlence ağırlıklı şüpheli harcama"
+
+- id: case_5
+  description: "Yazılım ekibi için 'Designing Data-Intensive Applications' teknik referans kitabı"
+  amount_cents: 65000
+  merchant: "D&R Kitap Mağazası"
+  category: "Eğitim"
+  spent_on: "2026-10-19"
+  submitted_by: "HRBot"
+  expected_verdict: "approve"
+  note: "Madde 7: Mesleki gelişim kitabı ve 1.000 TL altı"
+
+- id: case_6
+  description: "Yeni mühendis için 16 inç Apple MacBook Pro M4 iş istasyonu alımı"
+  amount_cents: 950000
+  merchant: "Apple Store Zorlu Center"
+  category: "Donanım"
+  spent_on: "2026-10-22"
+  submitted_by: "ITProcurement"
+  expected_verdict: "flag"
+  note: "Madde 2: 5.000 TL üzeri harcama CFO incelemesine tabidir"
+
+- id: case_7
+  description: "Ofis toplantı odası için ergonomik kablosuz klavye ve fare"
+  amount_cents: 75000
+  merchant: "Teknosa Mağazacılık"
+  category: "Ofis Malzemeleri"
+  spent_on: "2026-10-21"
+  submitted_by: "OfficeBot"
+  expected_verdict: "approve"
+  note: "Madde 1: 1.000 TL altı ofis ergonomi ekipmanı"
+
+- id: case_8
+  description: "Şirket arabası olmayan çalışan için hafta sonu özel şahsi benzin harcaması"
+  amount_cents: 180000
+  merchant: "Opet Akaryakıt İstasyonu"
+  category: "Ulaşım"
+  spent_on: "2026-10-24"
+  submitted_by: "TravelAgent"
+  expected_verdict: "flag"
+  note: "Madde 5 ve 9: Hafta sonu şahsi akaryakıt kullanımı"
+
+- id: case_9
+  description: "Yıllık AWS GPU sunucu rezervasyon taahhüt ücreti"
+  amount_cents: 420000
+  merchant: "Amazon Web Services"
+  category: "Bulut Altyapısı"
+  spent_on: "2026-10-22"
+  submitted_by: "CloudBot"
+  expected_verdict: "flag"
+  note: "Madde 6: Uzun dönemli rezervasyon ve taahhüt yönetici incelemesi gerektirir"
+
+- id: case_10
+  description: "Ofis mutfağı için çay, filtre kahve ve su siparişi"
+  amount_cents: 55000
+  merchant: "Migros Sanal Market"
+  category: "Ofis Sarf"
+  spent_on: "2026-10-23"
+  submitted_by: "OfficeBot"
+  expected_verdict: "approve"
+  note: "Madde 1: Ofis sarf ihtiyacı ve 1.000 TL altı"
+
+- id: case_11
+  description: "Genel departman harcaması ve muhtelif giderler"
+  amount_cents: 90000
+  merchant: "Çeşitli Ticaret Ltd."
+  category: "Diğer"
+  spent_on: "2026-10-21"
+  submitted_by: "FinanceAgent"
+  expected_verdict: "flag"
+  note: "Madde 10: Muğlak ve gerekçelendirilmemiş açıklama"
+
+- id: case_12
+  description: "İş ortağı teknoloji direktörü ile öğle yemeği iş toplantısı"
+  amount_cents: 95000
+  merchant: "Köşebaşı Kebap"
+  category: "Temsil ve Ağırlama"
+  spent_on: "2026-10-22"
+  submitted_by: "PartnershipBot"
+  expected_verdict: "approve"
+  note: "Madde 4: Hafta içi iş yemeği ve 1.000 TL altı makul tutar"
+
+- id: case_13
+  description: "Çalışanın evine PlayStation 5 oyun konsolu ve kumanda alımı"
+  amount_cents: 290000
+  merchant: "Vatan Bilgisayar"
+  category: "Elektronik"
+  spent_on: "2026-10-20"
+  submitted_by: "EmployeePerksBot"
+  expected_verdict: "flag"
+  note: "Madde 8: Şahsi oyun/eğlence cihazı şirket bütçesinden karşılanamaz"
+
+- id: case_14
+  description: "Figma Professional tasarım ekibi aylık lisans bedeli"
+  amount_cents: 72000
+  merchant: "Figma Inc."
+  category: "Yazılım / SaaS"
+  spent_on: "2026-10-23"
+  submitted_by: "DesignLead"
+  expected_verdict: "approve"
+  note: "Madde 3: İş amaçlı tasarım aracı ve 1.000 TL altı"
