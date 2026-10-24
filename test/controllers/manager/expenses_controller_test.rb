@@ -146,4 +146,29 @@ class Manager::ExpensesControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "TRAVELBOT"
     assert_includes response.body, "API iletildi"
   end
+
+  test "yeni harcama formu sayfasi goruntulenir" do
+    sign_in_as @manager_user
+    get new_manager_expense_path
+    assert_response :success
+    assert_includes response.body, "Canlı Harcama Gir ve Test Et"
+  end
+
+  test "yeni harcama formundan gonderilen harcama kaydedilir ve incelenir" do
+    sign_in_as @manager_user
+    assert_difference "Expense.count", 1 do
+      post manager_expenses_path, params: {
+        amount_try: "250.50",
+        merchant: "Test Kitap Kırtasiye",
+        category: "Ofis",
+        description: "Ofis için not defteri ve kalemler",
+        submitted_by: "hoca-canli-demo"
+      }
+    end
+
+    created = Expense.order(created_at: :desc).first
+    assert_equal 25050, created.amount_cents
+    assert_equal "Test Kitap Kırtasiye", created.merchant
+    assert_equal "hoca-canli-demo", created.submitted_by
+  end
 end

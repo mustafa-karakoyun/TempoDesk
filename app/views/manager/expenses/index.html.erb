@@ -25,11 +25,18 @@
         </p>
       </div>
 
-      <!-- Özet Sayaç -->
-      <div style="background: #ffffff; border: 1px solid var(--slate-200); border-radius: var(--radius-md); padding: 10px 18px; box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 10px;">
-        <span style="width: 10px; height: 10px; border-radius: 50%; background: <%= is_cfo ? '#6b21a8' : '#d97706' %>;"></span>
-        <span style="font-size: 0.9rem; color: var(--slate-600);">Bekleyen Harcama:</span>
-        <strong style="font-size: 1.15rem; color: #0f172a;"><%= @expenses.size %></strong>
+      <!-- Aksiyon ve Özet Sayaç -->
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <div style="background: #ffffff; border: 1px solid var(--slate-200); border-radius: var(--radius-md); padding: 10px 18px; box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 10px;">
+          <span style="width: 10px; height: 10px; border-radius: 50%; background: <%= is_cfo ? '#6b21a8' : '#d97706' %>;"></span>
+          <span style="font-size: 0.9rem; color: var(--slate-600);">Bekleyen Harcama:</span>
+          <strong style="font-size: 1.15rem; color: #0f172a;"><%= @expenses.size %></strong>
+        </div>
+
+        <a href="<%= new_manager_expense_path %>" style="background: #0f172a; color: #ffffff; padding: 10px 18px; border-radius: var(--radius-md); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; box-shadow: var(--shadow-sm);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          + Canlı Harcama Gir (Test Et)
+        </a>
       </div>
     </div>
   </div>

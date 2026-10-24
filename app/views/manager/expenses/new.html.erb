@@ -1,0 +1,78 @@
+<% content_for :title, "Yeni Harcama Gir (Canlı Denetim Testi) | Kâhya" %>
+
+<div class="page-container" style="max-width: 720px; margin: 0 auto; padding: var(--space-6) var(--space-4);">
+  <div style="margin-bottom: var(--space-6);">
+    <a href="<%= manager_expenses_path %>" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--slate-600); text-decoration: none; margin-bottom: 12px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      Harcamalar Listesine Dön
+    </a>
+    <h1 style="font-size: 1.75rem; font-weight: 700; color: #0f172a; margin: 0 0 8px 0; letter-spacing: -0.02em;">
+      Canlı Harcama Gir ve Test Et
+    </h1>
+    <p style="font-size: 0.95rem; color: var(--slate-600); margin: 0;">
+      Aşağıdaki formu doldurup gönderdiğinizde, harcama <strong>Gemini Yapay Zekası (Kâhya)</strong> tarafından canlı olarak şirket politikasına göre denetlenir. Temiz ve 1.000 TL altı harcamalar otomatik onaylanır; kural dışı veya yüksek tutarlı olanlar gerekçesiyle yönetici ekranına düşer.
+    </p>
+  </div>
+
+  <div class="card" style="background: #ffffff; border: 1px solid var(--slate-200); border-radius: var(--radius-lg); padding: var(--space-6); box-shadow: var(--shadow-sm);">
+    <%= form_with url: manager_expenses_path, method: :post, local: true do |f| %>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-4);">
+        <div>
+          <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #0f172a; margin-bottom: 6px;">
+            Harcama Tutarı (TL) *
+          </label>
+          <input type="number" step="0.01" min="1" name="amount_try" required placeholder="Örn: 450 veya 3500" style="width: 100%; padding: 10px 14px; border: 1px solid var(--slate-300); border-radius: var(--radius-md); font-size: 0.95rem;">
+          <small style="color: var(--slate-500); font-size: 0.75rem;">1.000 TL üzeri mutlaka yönetici onayına gider.</small>
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #0f172a; margin-bottom: 6px;">
+            Satıcı / Firma (Merchant) *
+          </label>
+          <input type="text" name="merchant" required placeholder="Örn: AWS, Ofis Kırtasiye, Meyhane Restoran" style="width: 100%; padding: 10px 14px; border: 1px solid var(--slate-300); border-radius: var(--radius-md); font-size: 0.95rem;">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-4);">
+        <div>
+          <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #0f172a; margin-bottom: 6px;">
+            Kategori *
+          </label>
+          <select name="category" required style="width: 100%; padding: 10px 14px; border: 1px solid var(--slate-300); border-radius: var(--radius-md); font-size: 0.95rem; background: #fff;">
+            <option value="Yemek">Yemek / Temsil</option>
+            <option value="Yazılım">Yazılım / Altyapı</option>
+            <option value="Ofis">Ofis Malzemesi</option>
+            <option value="Seyahat">Seyahat / Ulaşım</option>
+            <option value="Donanım">Donanım / Ekipman</option>
+            <option value="Diğer">Diğer</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #0f172a; margin-bottom: 6px;">
+            Harcamayı Yapan (Agent / Kişi)
+          </label>
+          <input type="text" name="submitted_by" value="demo-agent-01" style="width: 100%; padding: 10px 14px; border: 1px solid var(--slate-300); border-radius: var(--radius-md); font-size: 0.95rem;">
+        </div>
+      </div>
+
+      <div style="margin-bottom: var(--space-4);">
+        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #0f172a; margin-bottom: 6px;">
+          Harcama Açıklaması *
+        </label>
+        <textarea name="description" rows="3" required placeholder="Örn: 'Ekip yemeğinde 2 kadeh şarap ve yemek' veya 'Yazıcı için acil toner kartuşu'" style="width: 100%; padding: 10px 14px; border: 1px solid var(--slate-300); border-radius: var(--radius-md); font-size: 0.95rem;"></textarea>
+        <small style="color: var(--slate-500); font-size: 0.75rem;">Gemini bu açıklamayı 10 maddelik şirket politikası ile denetleyecektir.</small>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--slate-200);">
+        <a href="<%= manager_expenses_path %>" class="btn" style="padding: 10px 20px; border: 1px solid var(--slate-300); background: #ffffff; color: var(--slate-700); border-radius: var(--radius-md); font-weight: 600; text-decoration: none;">
+          İptal
+        </a>
+        <button type="submit" class="btn" style="padding: 10px 24px; background: #0f172a; color: #ffffff; border: none; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21 2-2 2m-1.5 1.5L16 7l-2-2m-1 3-3 3a5 5 0 1 1-7.07 0 5 5 0 0 1 7.07-7.07l3 3"></path><circle cx="7.5" cy="16.5" r="1.5"></circle></svg>
+          Kâhya ile Denetle ve Gönder
+        </button>
+      </div>
+    <% end %>
+  </div>
+</div>

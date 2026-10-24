@@ -16,6 +16,38 @@ class Manager::ExpensesController < ApplicationController
     @events = @expense.expense_events.order(created_at: :asc)
   end
 
+  def new
+    @expense = Expense.new(spent_on: Date.current, submitted_by: "demo-agent-01")
+  end
+
+  def create
+    amount_in_try = params[:amount_try].to_s.tr(",", ".").to_f
+    amount_cents = (amount_in_try * 100).round
+
+    expense_params = {
+      amount_cents: amount_cents,
+      merchant: params[:merchant].to_s.strip,
+      category: params[:category].to_s.strip,
+      description: params[:description].to_s.strip,
+      spent_on: params[:spent_on].presence || Date.current,
+      submitted_by: params[:submitted_by].presence || "demo-agent-01"
+    }
+
+    intake = ExpenseIntake.new
+    @expense = intake.process(expense_params)
+
+    if @expense.persisted?
+      if @expense.status_approved?
+        redirect_to manager_expenses_path, notice: "✅ Harcama sisteme girildi ve Kâhya (Gemini) tarafından OTOMATİK ONAYLANDI! (Gerekçe: #{@expense.llm_reason})"
+      else
+        redirect_to manager_expense_path(@expense), notice: "⚠️ Harcama Kâhya (Gemini) tarafından İNCELEMEYE ALINDI (Risk Skoru: %#{@expense.risk_score}). Gerekçe: #{@expense.llm_reason}"
+      end
+    else
+      flash.now[:alert] = "Harcama kaydedilemedi: #{@expense.errors.full_messages.join(', ')}"
+      render :new, status: :unprocessable_entity
+    end
+  end
+
   def decision
     unless @expense.status_pending_review?
       redirect_to manager_expenses_path, alert: "Bu harcama daha önce sonuçlandırılmıştır."

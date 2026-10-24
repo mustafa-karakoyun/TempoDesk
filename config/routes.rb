@@ -21,7 +21,7 @@ Rails.application.routes.draw do
   end
 
   namespace :manager do
-    resources :expenses, only: [ :index, :show ] do
+    resources :expenses, only: [ :index, :show, :new, :create ] do
       member do
         patch :decision
       end
