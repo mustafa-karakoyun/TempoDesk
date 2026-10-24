@@ -20,5 +20,13 @@ Rails.application.routes.draw do
     resources :expenses, only: [ :create ]
   end
 
+  namespace :manager do
+    resources :expenses, only: [ :index, :show ] do
+      member do
+        patch :decision
+      end
+    end
+  end
+
   get "up" => "rails/health#show", as: :rails_health_check
 end

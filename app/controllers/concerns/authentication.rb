@@ -3,7 +3,7 @@ module Authentication
 
   included do
     before_action :require_authentication
-    helper_method :authenticated?
+    helper_method :authenticated?, :current_user
   end
 
   class_methods do
@@ -13,6 +13,10 @@ module Authentication
   end
 
   private
+    def current_user
+      Current.user
+    end
+
     def authenticated?
       resume_session
     end
@@ -35,7 +39,14 @@ module Authentication
     end
 
     def after_authentication_url
-      session.delete(:return_to_after_authenticating) || agent_tickets_url
+      return_to = session.delete(:return_to_after_authenticating)
+      return return_to if return_to.present?
+
+      if Current.user&.role_manager? || Current.user&.role_cfo?
+        manager_expenses_url
+      else
+        agent_tickets_url
+      end
     end
 
     def start_new_session_for(user)

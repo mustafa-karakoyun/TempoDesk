@@ -118,43 +118,49 @@ Aort dilimi (*Müşteri bilet açar → Temsilci yanıtlar → Çözülür, çö
 - **Kamal & Ruby 4.0.7:** Ruby 4.0.7 ile Rails'in ürettiği `bin/kamal` çalışmamaktadır (`fiddle` gem uyumsuzluğu). Deploy doğrudan Docker ve Render altyapısı ile yapıldığı için Kamal kullanılmamıştır.
 - **Geliştirme / Deploy Ortamı:** Geliştirme ortamı Windows, deploy ortamı Linux konteynerdir. Satır sonlarının LF olduğu `.gitattributes` ile güvenceye alınmıştır.
 
-## 6. Kurulum ve Çalıştırma
+## 6. Kâhya Harcama Denetimi & Kurulum
 
-### Canlı Ortam (Render)
-- **Canlı Uygulama & Müşteri Formu:** [https://tempodesk.onrender.com/](https://tempodesk.onrender.com/)
-- **Temsilci Girişi:** [https://tempodesk.onrender.com/session/new](https://tempodesk.onrender.com/session/new)  
-  - *E-posta:* `agent@tempodesk.example`  
-  - *Parola:* `tempodesk-local-dev` (veya canlıda tanımlanan `AGENT_PASSWORD`)
-- **Temsilci Bilet Sırası:** [https://tempodesk.onrender.com/agent/tickets](https://tempodesk.onrender.com/agent/tickets)
-- **Sağlık Kontrolü:** [https://tempodesk.onrender.com/up](https://tempodesk.onrender.com/up) (HTTP 200 OK)
+### Roller ve Giriş Bilgileri
+- **Yönetici Girişi:** `manager@kahya.example` (Parola: `MANAGER_PASSWORD` veya yerelde `kahya-local-dev`)
+- **CFO Girişi:** `cfo@kahya.example` (Parola: `CFO_PASSWORD` veya yerelde `kahya-local-dev`)
+- **Destek Temsilcisi Girişi:** `agent@kahya.example` (Parola: `AGENT_PASSWORD` veya yerelde `kahya-local-dev`)
 
-### Yerel Ortam Kurulumu
-#### Gereksinimler
-- Ruby 3.4+ / Ruby 4
-- PostgreSQL (yerel servis çalışır durumda olmalı)
+### Gerekli Ortam Değişkenleri
+| Değişken | Açıklama |
+| :--- | :--- |
+| `GEMINI_API_KEY` | Google AI Studio'dan alınan Gemini REST API anahtarı |
+| `GEMINI_MODEL` | Kullanılacak model adı (`gemini-2.5-flash` veya `gemini-1.5-flash`) |
+| `AGENT_API_KEY` | `POST /api/expenses` için yetkilendirme anahtarı (`Authorization: Bearer <KEY>`) |
+| `MANAGER_PASSWORD` | Canlıda yönetici hesabı için güçlü şifre (üretimde zorunlu) |
+| `CFO_PASSWORD` | Canlıda CFO hesabı için güçlü şifre (üretimde zorunlu) |
+| `AGENT_PASSWORD` | Canlıda destek temsilcisi hesabı için güçlü şifre (üretimde zorunlu) |
+| `PGPASSWORD` | PostgreSQL veritabanı parolası |
 
-#### Adımlar (Windows PowerShell)
+### Çalıştırma Komutları
 ```powershell
-# Bağımlılıkları yükleyin
-bundle install
+# Veritabanını kurun ve idempotent demo verilerini yükleyin
+ruby bin/rails db:migrate db:seed
 
-# Veritabanını oluşturun, şemayı yükleyin ve demo verisini yükleyin
-$env:PGPASSWORD = "postgres_sifreniz"
-ruby bin/rails db:create db:migrate db:seed
-
-# Test paketini çalıştırın (53 test, 228 assertion)
+# Tüm test paketini çalıştırın (85 test, 381 assertion, 0 failure)
 ruby bin/rails test
 
-# Sunucuyu başlatın
-ruby bin/rails server
+# Gerçek Gemini API ile 14 sentetik vakayı değerlendirin
+ruby bin/rails eval:llm
+
+# Demo Agent simülasyonunu çalıştırın (3 farklı harcama gönderir)
+./docs/demo_agent.sh http://localhost:3000 kahya-secret-agent-key-2026
 ```
 
-#### Yerel Ekranlar ve Erişim
-- **Müşteri Bilet Formu:** `http://localhost:3000/`
-- **Temsilci Girişi:** `http://localhost:3000/session/new`  
-  - *E-posta:* `agent@tempodesk.example`  
-  - *Geliştirme Parolası:* `tempodesk-local-dev`
-- **Temsilci Bilet Sırası:** `http://localhost:3000/agent/tickets`
-- **Sağlık Kontrolü:** `http://localhost:3000/up` (200 OK)
-
 ---
+
+## 7. Kapsam Dışı ve Bilerek Yapılmayanlar (Yapamadıklarım)
+
+Kâhya aort diliminde odak noktasını korumak ve güvenilirliği maksimize etmek amacıyla aşağıdaki konular bilerek kapsam dışı bırakılmıştır:
+1. **E-posta ve Telegram bildirimleri:** Canlıda güvenilir SMTP altyapısı bulunmadığından e-posta gönderimi bilerek eklenmemiştir; tüm süreç ekranlar ve denetim logları üzerinden yürütülür.
+2. **Kredi kartı ve ödeme altyapısı:** Ödeme çekimi veya banka entegrasyonu yapılmaz; yalnızca gerçekleşmiş harcamaların kurumsal denetimi yapılır.
+3. **Fiş / Fatura OCR:** Görselden metin çıkarma yerine doğrudan agent'ların API üzerinden ilettiği yapılandırılmış harcama verisi odak alınmıştır.
+4. **Çoklu Para Birimi:** Karmaşık kur hesaplamalarını önlemek için tüm harcamalar sabit Türk Lirası (TRY / kuruş) üzerinden modellenmiştir.
+5. **Geniş Kullanıcı Yönetimi:** Dinamik kullanıcı kayıt ekranı yerine kurumsal roller seed hesapları üzerinden tanımlanmıştır (`agent`, `manager`, `cfo`).
+6. **RAG (Retrieval-Augmented Generation):** Kurumsal harcama politikası kısa ve öz (10 madde) olduğundan RAG mimarisi yerine politikanın tam metni doğrudan prompt içine verilmiştir.
+7. **LLM'in Otomatik Reddetmesi:** Yapay zekanın meşru harcamaları hatalı reddetmesini önlemek için LLM yalnızca `approve` veya `flag` döner; ret kararı her zaman yetkili insana bırakılır.
+8. **Eski Bilet Akışının Korunması:** İlk haftanın aort dilimi olan destek masası ve SLA takip modülüne dokunulmamış, geriye dönük uyumluluk %100 korunmuştur.

@@ -1,0 +1,122 @@
+<% content_for :title, "#{@expense.merchant} Harcama Detayı ve Denetim İzi | Kâhya" %>
+
+<div class="page-container">
+  <!-- Geri Dönüş Linki -->
+  <div style="margin-bottom: var(--space-4);">
+    <a href="<%= manager_expenses_path %>" style="color: var(--slate-600); text-decoration: none; font-size: 0.9rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      Karar Listesine Dön
+    </a>
+  </div>
+
+  <!-- Harcama Detay Kartı -->
+  <article class="card" style="margin-bottom: var(--space-6); background: #ffffff;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: var(--space-4); margin-bottom: var(--space-4); border-bottom: 1px solid var(--slate-100); padding-bottom: var(--space-4);">
+      <div>
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+          <% if @expense.status_approved? %>
+            <span class="badge" style="background: #dcfce7; color: #15803d; border: 1px solid #86efac; font-weight: 700;">ONAYLANDI</span>
+          <% elsif @expense.status_rejected? %>
+            <span class="badge" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; font-weight: 700;">REDDEDİLDİ</span>
+          <% elsif @expense.escalated? %>
+            <span class="badge" style="background: #f3e8ff; color: #6b21a8; border: 1px solid #c084fc; font-weight: 700;">ESKALE EDİLDİ: CFO</span>
+          <% else %>
+            <span class="badge" style="background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; font-weight: 700;">İNCELEME BEKLİYOR</span>
+          <% end %>
+          <span style="font-size: 0.85rem; color: var(--slate-500);">Kategori: <strong><%= @expense.category %></strong></span>
+        </div>
+        <h1 style="font-size: 1.75rem; font-weight: 700; color: #0f172a; margin: 0 0 4px 0;"><%= @expense.merchant %></h1>
+        <div style="font-size: 0.85rem; color: var(--slate-500);">
+          Tarih: <%= @expense.spent_on %> • Gönderen Sistem: <strong><%= @expense.submitted_by %></strong>
+        </div>
+      </div>
+
+      <div style="text-align: right;">
+        <div class="expense-amount-lg" style="font-size: 2rem;">
+          <%= expense_amount_tag(@expense) %>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--slate-500); margin-top: 4px;">
+          Onaycı Rolü: <strong><%= @expense.effective_approver_role.upcase %></strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Açıklama -->
+    <div style="margin-bottom: var(--space-5);">
+      <h3 style="font-size: 0.9rem; font-weight: 600; color: var(--slate-700); margin-bottom: 6px;">Harcama Açıklaması:</h3>
+      <p style="font-size: 1rem; color: var(--slate-800); line-height: 1.5; margin: 0; background: var(--slate-50); padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid var(--slate-200);">
+        <%= @expense.description %>
+      </p>
+    </div>
+
+    <!-- Yapay Zekâ Değerlendirme Bölümü -->
+    <div class="llm-review-card" style="margin-bottom: var(--space-5);">
+      <div class="llm-review-header">
+        <span style="color: #0f172a;">Yapay Zekâ Denetim Notu ve Risk Analizi</span>
+        <% if @expense.risk_score.present? %>
+          <% r_class = @expense.risk_score >= 70 ? 'risk-high' : (@expense.risk_score >= 30 ? 'risk-medium' : 'risk-low') %>
+          <span class="risk-badge <%= r_class %>">Risk: <%= @expense.risk_score %>/100</span>
+        <% end %>
+      </div>
+      <% if @expense.policy_clause.present? %>
+        <div style="font-size: 0.85rem; font-weight: 600; color: #1e293b; margin-bottom: 6px;">
+          Politika Maddesi: <%= @expense.policy_clause %>
+        </div>
+      <% end %>
+      <p style="margin: 0; color: var(--slate-700); line-height: 1.5;">
+        <%= @expense.llm_reason.presence || "Değerlendirme notu bulunmuyor." %>
+      </p>
+    </div>
+
+    <!-- Karar Aksiyonu (Hala bekliyorsa ve kullanıcının yetkisi varsa) -->
+    <% if @expense.status_pending_review? && current_user.role.to_s == @expense.effective_approver_role %>
+      <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius-md); padding: var(--space-4);">
+        <h3 style="font-size: 1rem; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Karar Ver</h3>
+        <%= form_with url: decision_manager_expense_path(@expense), method: :patch, class: "form-stack" do |f| %>
+          <div class="form-group" style="margin-bottom: var(--space-3);">
+            <%= f.label :note, "Karar Gerekçesi / Notu (Opsiyonel):", class: "form-label" %>
+            <%= f.text_area :note, rows: 2, class: "form-input", placeholder: "Onay veya ret gerekçenizi yazabilirsiniz..." %>
+          </div>
+          <div style="display: flex; gap: var(--space-3);">
+            <%= f.button "Onayla", name: :decision, value: :approve, class: "btn-approve" %>
+            <%= f.button "Reddet", name: :decision, value: :reject, class: "btn-reject" %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </article>
+
+  <!-- Dikey Denetim İzi Zaman Çizelgesi (Vertical Audit Trail) -->
+  <section class="card" style="background: #ffffff;">
+    <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-bottom: 4px;">
+      Denetim Kaydı Zaman Çizelgesi
+    </h2>
+    <p style="font-size: 0.85rem; color: var(--slate-500); margin-bottom: var(--space-5);">
+      Harcamanın sistemdeki tüm hareketleri, AI değerlendirmesi ve yetkili kararları geriye dönük değiştirilemez şekilde kaydedilir.
+    </p>
+
+    <div class="audit-timeline">
+      <% @events.each do |event| %>
+        <div class="audit-event-item">
+          <div class="audit-event-dot"></div>
+          <div class="audit-event-content">
+            <div class="audit-event-header">
+              <span class="audit-actor-name">
+                <%= event.actor.upcase %>
+              </span>
+              <span class="audit-timestamp">
+                <%= event.created_at.strftime("%d.%m.%Y %H:%M:%S") %>
+              </span>
+            </div>
+            <span class="audit-action-badge">
+              İşlem: <%= event.action %>
+            </span>
+            <div class="audit-reason-text">
+              <%= event.reason.presence || "Gerekçe belirtilmedi." %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </section>
+</div>

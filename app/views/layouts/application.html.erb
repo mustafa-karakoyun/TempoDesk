@@ -30,12 +30,16 @@
         </a>
 
         <nav class="nav-links">
-          <a href="<%= root_path %>" class="nav-link">Yeni Bilet</a>
           <% if authenticated? %>
-            <a href="<%= agent_tickets_path %>" class="nav-link nav-link-agent">Temsilci Paneli</a>
+            <% if current_user&.role_manager? || current_user&.role_cfo? %>
+              <a href="<%= manager_expenses_path %>" class="nav-link">Harcamalar</a>
+            <% end %>
+            <a href="<%= agent_tickets_path %>" class="nav-link">Destek</a>
+            <span class="user-badge" style="font-size: 0.85rem; color: var(--slate-600);"><%= current_user&.email_address %></span>
             <%= button_to "Çıkış Yap", session_path, method: :delete, class: "nav-btn-logout" %>
           <% else %>
-            <a href="<%= new_session_path %>" class="nav-link nav-link-agent">Temsilci Girişi</a>
+            <a href="<%= root_path %>" class="nav-link">Yeni Bilet</a>
+            <a href="<%= new_session_path %>" class="nav-link nav-link-agent">Giriş Yap</a>
           <% end %>
         </nav>
       </div>
