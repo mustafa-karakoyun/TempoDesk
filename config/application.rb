@@ -23,6 +23,17 @@ module Tempodesk
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.1
 
+    # Load local .env if present (without extra gem dependencies)
+    dot_env = Rails.root.join(".env")
+    if File.exist?(dot_env)
+      File.foreach(dot_env) do |line|
+        trimmed = line.strip
+        next if trimmed.empty? || trimmed.start_with?("#")
+        k, v = trimmed.split("=", 2)
+        ENV[k.strip] ||= v.strip.gsub(/\A["']|["']\z/, "") if k && v
+      end
+    end
+
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
