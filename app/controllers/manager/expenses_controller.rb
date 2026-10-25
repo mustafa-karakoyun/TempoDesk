@@ -3,13 +3,25 @@ class Manager::ExpensesController < ApplicationController
   before_action :set_expense, only: [ :show, :decision ]
 
   def index
-    all_pending = Expense.where(status: :pending_review).order(created_at: :desc)
+    @current_tab = params[:tab].presence || "pending"
 
-    @expenses = if current_user.role_cfo?
-      all_pending.select { |e| e.effective_approver_role == "cfo" }
-    else
-      all_pending.select { |e| e.effective_approver_role == "manager" }
-    end
+    @pending_count = Expense.where(status: :pending_review).count
+    @approved_count = Expense.where(status: :approved).count
+    @rejected_count = Expense.where(status: :rejected).count
+
+    @expenses = case @current_tab
+                when "approved"
+                  Expense.where(status: :approved).order(decided_at: :desc, created_at: :desc)
+                when "rejected"
+                  Expense.where(status: :rejected).order(decided_at: :desc, created_at: :desc)
+                else
+                  all_pending = Expense.where(status: :pending_review).order(created_at: :desc)
+                  if current_user.role_cfo?
+                    all_pending.select { |e| e.effective_approver_role == "cfo" }
+                  else
+                    all_pending.select { |e| e.effective_approver_role == "manager" }
+                  end
+                end
   end
 
   def show
@@ -95,7 +107,7 @@ class Manager::ExpensesController < ApplicationController
 
     if @expense.persisted?
       if @expense.status_approved?
-        redirect_to manager_expenses_path, notice: "🤖 Otonom Ajan (#{@expense.submitted_by}) 1 harcama iletti. Kâhya (Gemini) inceledi ve OTOMATİK ONAYLADI! (Gerekçe: #{@expense.llm_reason})"
+        redirect_to manager_expenses_path(tab: "approved"), notice: "🤖 Otonom Ajan (#{@expense.submitted_by}) 1 harcama iletti. Kâhya (Gemini) inceledi ve OTOMATİK ONAYLADI! Onaylanan Harcamalar sekmesinde görüntüleniyor. (Gerekçe: #{@expense.llm_reason})"
       else
         redirect_to manager_expense_path(@expense), notice: "🤖 Otonom Ajan (#{@expense.submitted_by}) 1 harcama iletti. Kâhya (Gemini) İNCELEMEYE ALINDI (Risk Skoru: %#{@expense.risk_score}). Gerekçe: #{@expense.llm_reason}"
       end

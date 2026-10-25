@@ -1997,16 +1997,77 @@ body {
   padding: 1.5rem 0;
 }
 
-.stitch-footer-inner {
-  max-width: 1140px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
+/* Stitch Tabs Bar */
+.stitch-tabs-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.stitch-tab-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #64748b;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.stitch-tab-link:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.stitch-tab-link.active {
+  background: #0f172a;
+  color: #ffffff;
+}
+
+.stitch-tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 9999px;
+}
+
+.stitch-tab-badge.amber { background: #fe932c; color: #663500; }
+.stitch-tab-badge.green { background: #dcfce7; color: #15803d; }
+.stitch-tab-badge.red { background: #fee2e2; color: #b91c1c; }
+
+/* Status banners on cards */
+.stitch-approved-banner {
+  background: #ecfdf5;
+  border-bottom: 1px solid rgba(134, 239, 172, 0.4);
+  padding: 0.7rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 1rem;
-  font-size: 0.75rem;
-  color: #64748b;
+  gap: 0.5rem;
 }
+
+.stitch-approved-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+  border-radius: 6px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
 

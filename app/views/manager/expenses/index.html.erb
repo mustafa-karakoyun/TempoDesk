@@ -1,5 +1,5 @@
 <% is_cfo = current_user.role_cfo? %>
-<% content_for :title, (is_cfo ? "CFO Onayı Bekleyenler | Kâhya" : "Harcamalar | Yönetici Paneli | Kâhya") %>
+<% content_for :title, (@current_tab == 'approved' ? "Onaylanan Harcamalar | Kâhya" : (@current_tab == 'rejected' ? "Reddedilen Harcamalar | Kâhya" : (is_cfo ? "CFO Onayı Bekleyenler | Kâhya" : "Harcamalar | Yönetici Paneli | Kâhya"))) %>
 
 <div>
   <!-- Sayfa Başlığı ve Özet Metrikleri -->
@@ -13,10 +13,20 @@
         <span style="font-size: 0.75rem; color: #64748b;">Yetkili: <%= current_user.email_address %></span>
       </div>
       <h1 style="font-size: 1.85rem; font-weight: 700; color: #0f172a; letter-spacing: -0.02em; margin: 0 0 0.4rem 0;">
-        Karar bekleyen harcamalar
+        <% if @current_tab == 'approved' %>
+          Onaylanan Harcamalar (Gemini & Yönetici)
+        <% elsif @current_tab == 'rejected' %>
+          Reddedilen Harcamalar
+        <% else %>
+          Karar bekleyen harcamalar
+        <% end %>
       </h1>
       <p style="font-size: 0.9rem; color: #64748b; margin: 0; max-width: 680px; line-height: 1.5;">
-        <% if is_cfo %>
+        <% if @current_tab == 'approved' %>
+          Yapay zekâ (Gemini LLM) tarafından doğrudan otomatik onaylanan veya yöneticiler tarafından uygun görülen harcamalar.
+        <% elsif @current_tab == 'rejected' %>
+          Şirket harcama politikalarına aykırı bulunarak reddedilen harcama kayıtları.
+        <% elsif is_cfo %>
           5.000 TL üzeri yüksek tutarlı ve 24 saat içinde yönetici tarafından karara bağlanmayarak eskale olmuş harcamalar.
         <% else %>
           AI politikası tarafından gri alanda değerlendirilen ve yönetici onayı gerektiren harcamalar. 24 saat içinde karar verilmeyen kalemler CFO onayına devredilir.
@@ -38,20 +48,44 @@
     </div>
   </div>
 
+  <!-- Sekmeler (Stitch Tabs Bar) -->
+  <div class="stitch-tabs-bar">
+    <a href="<%= manager_expenses_path(tab: 'pending') %>" class="stitch-tab-link <%= @current_tab == 'pending' ? 'active' : '' %>">
+      <span>Karar Bekleyenler</span>
+      <span class="stitch-tab-badge <%= @current_tab == 'pending' ? '' : 'amber' %>" style="<%= @current_tab == 'pending' ? 'background: #ffffff; color: #0f172a;' : '' %>">
+        <%= @pending_count %>
+      </span>
+    </a>
+
+    <a href="<%= manager_expenses_path(tab: 'approved') %>" class="stitch-tab-link <%= @current_tab == 'approved' ? 'active' : '' %>">
+      <span>✅ Onaylanan Harcamalar</span>
+      <span class="stitch-tab-badge <%= @current_tab == 'approved' ? '' : 'green' %>" style="<%= @current_tab == 'approved' ? 'background: #ffffff; color: #0f172a;' : '' %>">
+        <%= @approved_count %>
+      </span>
+    </a>
+
+    <a href="<%= manager_expenses_path(tab: 'rejected') %>" class="stitch-tab-link <%= @current_tab == 'rejected' ? 'active' : '' %>">
+      <span>❌ Reddedilenler</span>
+      <span class="stitch-tab-badge <%= @current_tab == 'rejected' ? '' : 'red' %>" style="<%= @current_tab == 'rejected' ? 'background: #ffffff; color: #0f172a;' : '' %>">
+        <%= @rejected_count %>
+      </span>
+    </a>
+  </div>
+
   <!-- Özet Bilgi Çubuğu (Stitch Summary Bar) -->
   <div class="stitch-summary-bar">
     <div class="stitch-metrics-list">
       <div class="stitch-metric-item">
         <span class="stitch-metric-dot <%= is_cfo ? 'purple' : 'amber' %>"></span>
         <span style="color: #64748b;">Bekleyen:</span>
-        <span class="stitch-metric-value"><%= @expenses.size %> harcama</span>
+        <span class="stitch-metric-value"><%= @pending_count %> harcama</span>
       </div>
       <span style="display: inline-block; width: 1px; height: 16px; background: #e2e8f0;"></span>
 
       <div class="stitch-metric-item">
         <span class="stitch-metric-dot green"></span>
-        <span style="color: #64748b;">Bugün otomatik onaylanan:</span>
-        <span class="stitch-metric-value"><%= Expense.where(status: :approved, decided_by: "llm").where("created_at >= ?", Time.current.beginning_of_day).count %> harcama</span>
+        <span style="color: #64748b;">Toplam Onaylanan:</span>
+        <span class="stitch-metric-value"><%= @approved_count %> harcama</span>
       </div>
       <span style="display: inline-block; width: 1px; height: 16px; background: #e2e8f0;"></span>
 
@@ -64,7 +98,7 @@
 
     <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: #475569; background: #eff4ff; padding: 0.35rem 0.75rem; border-radius: 6px;">
       <span class="material-symbols-outlined" style="font-size: 16px; color: #2563eb;">verified_user</span>
-      <span>Maksimum gecikme kuralı aktif</span>
+      <span>Harcama Denetim Motoru Aktif</span>
     </div>
   </div>
 
@@ -76,26 +110,65 @@
         <span class="material-symbols-outlined" style="font-size: 28px;">check_circle</span>
       </div>
       <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin: 0 0 0.5rem 0;">
-        <%= is_cfo ? "CFO Onayı Bekleyen Harcama Yok" : "Tebrikler! Karar Bekleyen Harcama Yok" %>
+        <% if @current_tab == 'approved' %>
+          Henüz onaylanmış harcama bulunmamaktadır.
+        <% elsif @current_tab == 'rejected' %>
+          Henüz reddedilmiş harcama bulunmamaktadır.
+        <% else %>
+          <%= is_cfo ? "CFO Onayı Bekleyen Harcama Yok" : "Tebrikler! Karar Bekleyen Harcama Yok" %>
+        <% end %>
       </h3>
       <p style="font-size: 0.875rem; color: #64748b; margin: 0 0 1.5rem 0;">
-        Şu anda karar havuzunda bekleyen harcama bulunmamaktadır.
+        <% if @current_tab == 'approved' %>
+          Yapay zekâ veya yöneticiler harcama onayladığında burada listelenir.
+        <% else %>
+          Yeni bir harcama geldiğinde yapay zekâ denetleyip ilgili havuza aktaracaktır.
+        <% end %>
       </p>
-      <a href="<%= new_manager_expense_path %>" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.55rem 1.25rem; background: #0f172a; color: #ffffff; border-radius: 8px; font-size: 0.85rem; font-weight: 600; text-decoration: none;">
-        <span class="material-symbols-outlined" style="font-size: 16px;">add</span>
-        <span>Test Harcaması Gönder</span>
-      </a>
+      <%= button_to simulate_agent_manager_expenses_path, method: :post, style: "display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.55rem 1.25rem; background: #6b21a8; color: #ffffff; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer;" do %>
+        <span class="material-symbols-outlined" style="font-size: 16px;">smart_toy</span>
+        <span>Ajanla 1 Harcama Simüle Et</span>
+      <% end %>
     </div>
   <% else %>
     <div class="stitch-cards-grid">
       <% @expenses.each do |expense| %>
         <% is_escalated = expense.escalated? %>
+        <% is_approved = expense.status_approved? %>
+        <% is_rejected = expense.status_rejected? %>
         <% risk = expense.risk_score || 0 %>
         <% risk_class = risk >= 75 ? "high" : (risk >= 40 ? "medium" : "low") %>
         <% risk_text_color = risk >= 75 ? "#ba1a1a" : (risk >= 40 ? "#b45309" : "#15803d") %>
 
-        <article class="stitch-card <%= is_escalated ? 'escalated' : '' %>">
-          <% if is_escalated %>
+        <article class="stitch-card <%= is_escalated ? 'escalated' : '' %>" style="<%= is_approved ? 'border-color: #86efac;' : '' %>">
+          <% if is_approved %>
+            <!-- Onaylandı Banner -->
+            <div class="stitch-approved-banner">
+              <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.8rem; color: #15803d;">
+                <span class="material-symbols-outlined" style="font-size: 18px;">check_circle</span>
+                <span>
+                  <strong><%= expense.decided_by == 'llm' ? 'Kâhya Gemini AI (Otomatik Onay)' : 'Yönetici Onayı' %></strong>
+                  • Gönderen Ajan: <strong><%= expense.submitted_by %></strong>
+                </span>
+              </div>
+              <span class="stitch-approved-badge">
+                ONAYLANDI
+              </span>
+            </div>
+          <% elsif is_rejected %>
+            <!-- Reddedildi Banner -->
+            <div style="background: #fef2f2; border-bottom: 1px solid #fecaca; padding: 0.7rem 1.5rem; display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; color: #b91c1c;">
+              <div style="display: flex; align-items: center; gap: 0.6rem;">
+                <span class="material-symbols-outlined" style="font-size: 18px;">cancel</span>
+                <span>
+                  <strong>Yönetici Tarafından Reddedildi</strong> • Gönderen Ajan: <strong><%= expense.submitted_by %></strong>
+                </span>
+              </div>
+              <span style="display: inline-block; padding: 0.2rem 0.6rem; border-radius: 6px; font-weight: 700; font-size: 0.75rem; background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5;">
+                REDDEDİLDİ
+              </span>
+            </div>
+          <% elsif is_escalated %>
             <!-- Eskale Header Bar -->
             <div class="stitch-escalation-banner">
               <div style="display: flex; align-items: center; gap: 0.6rem;">
@@ -134,7 +207,7 @@
                     <h2 class="stitch-merchant-title"><%= expense.merchant %></h2>
                     <span class="stitch-category-tag"><%= expense.category %></span>
                     <span style="font-size: 0.75rem; color: #64748b;">
-                      Masraf Sahibi: <strong style="color: #0f172a;"><%= expense.submitted_by %></strong>
+                      Ajan / Gönderen: <strong style="color: #0f172a;"><%= expense.submitted_by %></strong>
                     </span>
                   </div>
                   <p style="font-size: 0.875rem; color: #475569; margin: 0.4rem 0 0 0; line-height: 1.5;">
@@ -148,7 +221,7 @@
                 <div style="font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; text-align: right; margin-bottom: 2px;">
                   Harcama Tutarı
                 </div>
-                <div class="stitch-amount-display">
+                <div class="stitch-amount-display" style="<%= is_approved ? 'color: #15803d;' : '' %>">
                   <%= expense_amount_tag(expense) %>
                 </div>
               </div>
@@ -158,8 +231,12 @@
             <div class="stitch-ai-panel">
               <div class="stitch-ai-panel-header">
                 <div style="display: flex; align-items: center; gap: 0.4rem;">
-                  <span class="material-symbols-outlined" style="font-size: 20px; color: #d97706;">psychology</span>
-                  <span style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">AI Politikası Analizi</span>
+                  <span class="material-symbols-outlined" style="font-size: 20px; color: <%= is_approved ? '#15803d' : '#d97706' %>;">
+                    <%= is_approved ? 'verified' : 'psychology' %>
+                  </span>
+                  <span style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">
+                    <%= is_approved ? 'Kâhya Denetim Sonucu (Onay)' : 'AI Politikası Analizi' %>
+                  </span>
                 </div>
 
                 <div class="stitch-risk-meter">
@@ -188,7 +265,17 @@
             <!-- Alt Alan: Süre ve Karar Butonları -->
             <div class="stitch-card-actions">
               <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem;">
-                <% if is_escalated %>
+                <% if is_approved %>
+                  <span class="material-symbols-outlined" style="font-size: 18px; color: #15803d;">task_alt</span>
+                  <span style="color: #15803d; font-weight: 600;">
+                    <%= l(expense.decided_at || expense.updated_at, format: :short) %> tarihinde onaylandı
+                  </span>
+                <% elsif is_rejected %>
+                  <span class="material-symbols-outlined" style="font-size: 18px; color: #b91c1c;">block</span>
+                  <span style="color: #b91c1c; font-weight: 600;">
+                    <%= l(expense.decided_at || expense.updated_at, format: :short) %> tarihinde reddedildi
+                  </span>
+                <% elsif is_escalated %>
                   <span class="material-symbols-outlined" style="font-size: 18px; color: #6b21a8;">lock_clock</span>
                   <span style="color: #6b21a8; font-weight: 700;">Süre doldu (CFO yetkisinde)</span>
                 <% else %>
@@ -203,20 +290,22 @@
                   <span>Detay & Denetim İzi</span>
                 </a>
 
-                <% if (is_cfo && expense.effective_approver_role == "cfo") || (!is_cfo && expense.effective_approver_role == "manager") %>
-                  <%= button_to decision_manager_expense_path(expense), method: :patch, params: { decision: "reject" }, class: "stitch-btn-reject" do %>
-                    <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
-                    <span>Reddet</span>
-                  <% end %>
+                <% if !is_approved && !is_rejected %>
+                  <% if (is_cfo && expense.effective_approver_role == "cfo") || (!is_cfo && expense.effective_approver_role == "manager") %>
+                    <%= button_to decision_manager_expense_path(expense), method: :patch, params: { decision: "reject" }, class: "stitch-btn-reject" do %>
+                      <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
+                      <span>Reddet</span>
+                    <% end %>
 
-                  <%= button_to decision_manager_expense_path(expense), method: :patch, params: { decision: "approve" }, class: "stitch-btn-approve" do %>
-                    <span class="material-symbols-outlined" style="font-size: 16px;">check</span>
-                    <span>Onayla</span>
+                    <%= button_to decision_manager_expense_path(expense), method: :patch, params: { decision: "approve" }, class: "stitch-btn-approve" do %>
+                      <span class="material-symbols-outlined" style="font-size: 16px;">check</span>
+                      <span>Onayla</span>
+                    <% end %>
+                  <% else %>
+                    <span style="font-size: 0.75rem; color: #94a3b8; font-style: italic;">
+                      Bu aşamada karar yetkisi: <%= expense.effective_approver_role.upcase %>
+                    </span>
                   <% end %>
-                <% else %>
-                  <span style="font-size: 0.75rem; color: #94a3b8; font-style: italic;">
-                    Bu aşamada karar yetkisi: <%= expense.effective_approver_role.upcase %>
-                  </span>
                 <% end %>
               </div>
             </div>
