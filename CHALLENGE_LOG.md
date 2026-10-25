@@ -72,7 +72,7 @@ Finished in 3.31s, 26.24 runs/s, 117.31 assertions/s.
 
 ## 5. Harcanan Zaman
 
-* **İnsan Zamanı:** ~6 saat (Gereksinim analizi, kurumsal politika maddelerinin yazımı, prompt optimizasyonu, eval seti vakalarının tasarımı ve doğrulama).
+* **İnsan Zamanı:** ~3 saat (Gereksinim analizi, kurumsal politika maddelerinin yazımı, prompt optimizasyonu, eval seti vakalarının tasarımı ve doğrulama).
 * **Agent Zamanı:** ~1 saat (Tüm Ruby/Rails kodları, test suiteleri, Stitch saf Vanilla CSS entegrasyonu ve dokümantasyon).
 * **Ajana Verilen İlk Prompt:**
   > *"Mevcut TempoDesk Rails uygulamasına harcama denetimi modülü ekliyoruz ve ürünün görünen adını Kâhya yapıyoruz. Yeni repo yok, yeni Render servisi yok: aynı repo, aynı CI, aynı deploy. Aort dilimi: Bir agent (ya da webhook) API'den harcama gönderir -> LLM şirket politikasına göre denetler -> temiz harcama otomatik onaylanır, gri alandaki harcama gerekçesiyle yöneticiye düşer -> yönetici tek tıkla onaylar/reddeder -> 24 saat cevapsız kalırsa CFO'ya eskale olur. Her adım denetim kaydına yazılır..."*

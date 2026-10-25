@@ -1,8 +1,8 @@
 require "test_helper"
 
 class CustomerTicketsTest < ActionDispatch::IntegrationTest
-  test "ana sayfada (GET /) bilet olusturma formu gorunur" do
-    get root_path
+  test "bilet olusturma formunda (GET /tickets/new) form alanlari gorunur" do
+    get new_ticket_path
     assert_response :success
     assert_select "h1", "Yeni Destek Talebi Oluştur"
     assert_select "form[action='/tickets']"

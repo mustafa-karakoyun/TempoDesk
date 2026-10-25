@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  root "tickets#new"
+  root "manager/expenses#index"
 
   resources :tickets, only: [ :new, :create ]
   get "t/:access_token", to: "tickets#show", as: :customer_ticket
