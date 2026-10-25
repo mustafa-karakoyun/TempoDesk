@@ -10,18 +10,18 @@ class Manager::ExpensesController < ApplicationController
     @rejected_count = Expense.where(status: :rejected).count
 
     @expenses = case @current_tab
-                when "approved"
+    when "approved"
                   Expense.where(status: :approved).order(decided_at: :desc, created_at: :desc)
-                when "rejected"
+    when "rejected"
                   Expense.where(status: :rejected).order(decided_at: :desc, created_at: :desc)
-                else
+    else
                   all_pending = Expense.where(status: :pending_review).order(created_at: :desc)
                   if current_user.role_cfo?
                     all_pending.select { |e| e.effective_approver_role == "cfo" }
                   else
                     all_pending.select { |e| e.effective_approver_role == "manager" }
                   end
-                end
+    end
   end
 
   def show

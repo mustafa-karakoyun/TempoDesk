@@ -90,7 +90,7 @@ class LlmReviewer
     req = Net::HTTP::Post.new(uri, "Content-Type" => "application/json")
     req.body = {
       contents: [
-        { parts: [{ text: prompt }] }
+        { parts: [ { text: prompt } ] }
       ],
       generationConfig: {
         responseMimeType: "application/json",
