@@ -33,8 +33,9 @@ Kurumsal ölçekte (Fortune 500 ve hızlı büyüyen teknoloji şirketleri) fina
 | **Çalışan Sayısı Aralığı** | 1.000 — 1.500.000+ çalışan | [Fortune 500 Şirket Verileri](https://fortune.com/ranking/fortune500/) |
 | **Firma Başı SaaS Sayısı** | Ortalama **100+ ile 320+ adet SaaS** | [BetterCloud State of SaaSOps Report](https://www.bettercloud.com/saasops-resources/state-of-saasops-report/) |
 | **Yıllık SaaS / Finansal Harcama** | Firma başı yıllık **~$50M – $100M+** | [Zylo SaaS Spend Management Index](https://zylo.com/blog/saas-spend-management) |
-| **Kurumsal Harcama Müşteri Örneği** | **Shopify** (Ramp kullanıcısı, 10.000+ çalışan) | [Ramp Müşteri Vaka Analizi: Shopify](https://ramp.com/customers/shopify) |
-| **Büyüme Ölçeği Müşteri Örneği** | **Webflow** (Ramp kullanıcısı, harcama denetimi) | [Ramp Müşteri Vaka Analizi: Webflow](https://ramp.com/customers/webflow) |
+| **Küresel Medya & Kurumsal Kanıt** | **Fortune Media** (Fortune 500 yayıncısı) | [PR Newswire: Fortune Media Selects Ramp to Modernize Financial Operations](https://www.prnewswire.com/news-releases/fortune-media-selects-ramp-to-modernize-financial-operations-302880062.html) |
+| **Kurumsal Harcama Müşteri Örneği** | **Shopify** (10.000+ çalışan) | [Ramp Müşteri Vaka Analizi: Shopify](https://ramp.com/customers/shopify) |
+| **Büyüme Ölçeği Müşteri Örneği** | **Webflow** (Harcama denetimi) | [Ramp Müşteri Vaka Analizi: Webflow](https://ramp.com/customers/webflow) |
 
 ---
 
@@ -48,7 +49,7 @@ Kurumsal harcama denetimi ve kart yönetim platformlarının (Ramp / Brex çekir
   * **LLM API & Token Maliyeti:** ~$100 — $150 (Claude 3.7 Sonnet / Gemini 2.5 Flash token tüketimi ve abonelik maliyeti).
   * **Süre:** 3 — 5 iş günü.
 * **Bu Projede Harcanan Gerçek Efor:**
-  * **İnsan Eforu:** ~6 saat (Gereksinim belirleme, prompt mühendisliği, politika kural seti tasarımı ve son test doğrulamaları).
+  * **İnsan Eforu:** ~3 saat (Gereksinim belirleme, kurumsal politika maddelerinin yazımı, prompt optimizasyonu, eval seti vakalarının tasarımı ve doğrulama).
   * **Agent Eforu:** ~1 saat (Tüm Rails modelleri, SLA eskalasyon hesaplamaları, Gemini API istemcisi, Stitch UI Vanilla CSS tasarımı ve 87 otomasyon testinin yazılması).
 
 ---
