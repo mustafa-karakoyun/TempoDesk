@@ -171,4 +171,16 @@ class Manager::ExpensesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Test Kitap Kırtasiye", created.merchant
     assert_equal "hoca-canli-demo", created.submitted_by
   end
+
+  test "simulate_agent tetiklendiginde tam 1 otonom harcama olusturulur" do
+    sign_in_as @manager_user
+    assert_difference "Expense.count", 1 do
+      post simulate_agent_manager_expenses_path
+    end
+
+    created = Expense.order(created_at: :desc).first
+    assert created.present?
+    assert created.amount_cents > 0
+    assert_match /Agent|Bot|Provisioner/, created.submitted_by
+  end
 end

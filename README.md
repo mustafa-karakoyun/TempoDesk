@@ -3,7 +3,7 @@
 [![CI](https://github.com/mustafa-karakoyun/TempoDesk/actions/workflows/ci.yml/badge.svg)](https://github.com/mustafa-karakoyun/TempoDesk/actions/workflows/ci.yml)
 ![Ruby](https://img.shields.io/badge/Ruby-4.0.7-red)
 ![Rails](https://img.shields.io/badge/Rails-8.1.4-red)
-![Tests](https://img.shields.io/badge/Tests-87%20passed-brightgreen)
+![Tests](https://img.shields.io/badge/Tests-88%20passed-brightgreen)
 ![Eval Accuracy](https://img.shields.io/badge/LLM%20Eval-85.7%25-blue)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 
@@ -102,7 +102,7 @@ Uygulamadaki her özellik kanıtlanabilir testlerle doğrulanmıştır:
 ```bash
 $ ruby bin/rails test
 Finished in 3.31s, 26.24 runs/s, 117.31 assertions/s.
-87 runs, 389 assertions, 0 failures, 0 errors, 0 skips
+88 runs, 395 assertions, 0 failures, 0 errors, 0 skips
 ```
 * **Kapsam:** Rol matrisi (Agent, Manager, CFO), API Bearer yetkilendirmesi, fail-closed LLM davranışı, tek tık karar aksiyonları, mükerrer karar engelleme, `travel_to` ile 24 saat 1 dakika sonra CFO'ya otomatik eskalasyon ve denetim izi zaman çizelgesi.
 

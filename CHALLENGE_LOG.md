@@ -53,9 +53,9 @@ Yeni sistemin taahhüdü:
 ### B. Otomasyon Test Kanıtı
 ```bash
 $ ruby bin/rails test
-Running 87 tests in a single process
+Running 88 tests in a single process
 Finished in 3.31s, 26.24 runs/s, 117.31 assertions/s.
-87 runs, 389 assertions, 0 failures, 0 errors, 0 skips
+88 runs, 395 assertions, 0 failures, 0 errors, 0 skips
 ```
 * **24 Saatlik Zaman Kuralı Testi:** `test/controllers/manager/expenses_controller_test.rb:106` içinde `travel_to` kullanılarak zaman 24 saat 1 dakika ileri sarılmış; yöneticinin bakmadığı kartın otomatik CFO ekranına düştüğü doğrulanmıştır.
 

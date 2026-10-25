@@ -24,11 +24,16 @@
       </p>
     </div>
 
-    <!-- Aksiyon Butonu -->
-    <div style="display: flex; align-items: center; gap: 0.75rem;">
+    <!-- Aksiyon Butonları -->
+    <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+      <%= button_to simulate_agent_manager_expenses_path, method: :post, style: "display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.6rem 1.15rem; background: #6b21a8; color: #ffffff; border: none; border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: all 0.15s ease;" do %>
+        <span class="material-symbols-outlined" style="font-size: 18px;">smart_toy</span>
+        <span>⚡ Otonom Ajanı Tetikle (1 Harcama)</span>
+      <% end %>
+
       <a href="<%= new_manager_expense_path %>" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.15rem; background: #0f172a; color: #ffffff; border-radius: 8px; font-size: 0.875rem; font-weight: 600; text-decoration: none; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
         <span class="material-symbols-outlined" style="font-size: 18px;">add_circle</span>
-        <span>+ Canlı Harcama Gir (Test Et)</span>
+        <span>+ Elle Test Harcaması Gir</span>
       </a>
     </div>
   </div>

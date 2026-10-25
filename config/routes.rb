@@ -22,6 +22,9 @@ Rails.application.routes.draw do
 
   namespace :manager do
     resources :expenses, only: [ :index, :show, :new, :create ] do
+      collection do
+        post :simulate_agent
+      end
       member do
         patch :decision
       end

@@ -48,6 +48,62 @@ class Manager::ExpensesController < ApplicationController
     end
   end
 
+  def simulate_agent
+    scenarios = [
+      {
+        merchant: "AWS Cloud Infrastructure",
+        category: "Yazılım",
+        amount_cents: 68_000,
+        description: "Production ortamı için dinamik bellek ve CPU kapasite artırımı",
+        submitted_by: "DevOpsAgent-01"
+      },
+      {
+        merchant: "TCDD & İbis Otel",
+        category: "Seyahat",
+        amount_cents: 245_000,
+        description: "Ankara müşteri sunumu için hızlı tren bileti ve 1 gece standart konaklama",
+        submitted_by: "TravelBot-03"
+      },
+      {
+        merchant: "Ofis Market Sarf Ltd.",
+        category: "Ofis",
+        amount_cents: 38_000,
+        description: "Yazıcı için siyah toner kartuşu ve A4 fotokopi kağıdı paketi",
+        submitted_by: "ProcurementBot-09"
+      },
+      {
+        merchant: "Boğaziçi Balık Restoranı",
+        category: "Yemek",
+        amount_cents: 185_000,
+        description: "Yurt dışı iş ortağı ile akşam yemeğinde 2 kadeh kırmızı şarap ve ikram",
+        submitted_by: "SalesAgent-02"
+      },
+      {
+        merchant: "Dell Yetkili Dağıtıcı",
+        category: "Donanım",
+        amount_cents: 680_000,
+        description: "Yeni sistem mimarı için Dell UltraSharp 32 inç 4K profesyonel monitör",
+        submitted_by: "ITProvisioner-04"
+      }
+    ]
+
+    scenario = scenarios.sample
+    expense_params = scenario.merge(spent_on: Date.current)
+
+    intake = ExpenseIntake.new
+    @expense = intake.process(expense_params)
+
+    if @expense.persisted?
+      if @expense.status_approved?
+        redirect_to manager_expenses_path, notice: "🤖 Otonom Ajan (#{@expense.submitted_by}) 1 harcama iletti. Kâhya (Gemini) inceledi ve OTOMATİK ONAYLADI! (Gerekçe: #{@expense.llm_reason})"
+      else
+        redirect_to manager_expense_path(@expense), notice: "🤖 Otonom Ajan (#{@expense.submitted_by}) 1 harcama iletti. Kâhya (Gemini) İNCELEMEYE ALINDI (Risk Skoru: %#{@expense.risk_score}). Gerekçe: #{@expense.llm_reason}"
+      end
+    else
+      redirect_to manager_expenses_path, alert: "Ajan harcaması oluşturulamadı: #{@expense.errors.full_messages.join(', ')}"
+    end
+  end
+
   def decision
     unless @expense.status_pending_review?
       redirect_to manager_expenses_path, alert: "Bu harcama daha önce sonuçlandırılmıştır."
